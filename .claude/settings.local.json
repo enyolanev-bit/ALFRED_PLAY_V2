@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:tympanus.net)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.utsubo.com)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
