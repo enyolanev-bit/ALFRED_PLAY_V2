@@ -50,6 +50,9 @@ export default class Scene2020 {
     /** @type {number} */
     this._scrollProgress = 0;
 
+    /** @type {number} Rotation ajoutée par l'interaction utilisateur (drag) */
+    this._interactionRotation = 0;
+
     /** @type {boolean} */
     this._initialized = false;
   }
@@ -79,8 +82,8 @@ export default class Scene2020 {
     this.brainGroup.scale.setScalar(scale);
     this.brainGroup.visible = entranceProgress > 0.01;
 
-    // Rotation douce du groupe principal
-    this.brainGroup.rotation.y = -0.3 + progress * Math.PI * 0.6;
+    // Rotation douce du groupe principal + interaction utilisateur
+    this.brainGroup.rotation.y = -0.3 + progress * Math.PI * 0.6 + this._interactionRotation;
 
     // Les anneaux orbitaux tournent plus vite (effet d'activité neuronale)
     if (this._ringsGroup) {
@@ -90,6 +93,14 @@ export default class Scene2020 {
 
     // Oscillation verticale
     this.brainGroup.position.y = Math.sin(progress * Math.PI) * 0.15;
+  }
+
+  /**
+   * Applique la rotation d'interaction utilisateur (drag horizontal).
+   * @param {number} rotationY — Rotation en radians
+   */
+  onInteraction(rotationY) {
+    this._interactionRotation = rotationY;
   }
 
   dispose() {

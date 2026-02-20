@@ -49,6 +49,9 @@ export default class Scene1990 {
     /** @type {number} */
     this._scrollProgress = 0;
 
+    /** @type {number} Rotation ajoutée par l'interaction utilisateur (drag) */
+    this._interactionRotation = 0;
+
     /** @type {boolean} */
     this._initialized = false;
   }
@@ -78,8 +81,8 @@ export default class Scene1990 {
     this.worldGroup.scale.setScalar(scale);
     this.worldGroup.visible = entranceProgress > 0.01;
 
-    // Le groupe tourne doucement
-    this.worldGroup.rotation.y = -0.3 + progress * Math.PI * 0.6;
+    // Le groupe tourne doucement + interaction utilisateur
+    this.worldGroup.rotation.y = -0.3 + progress * Math.PI * 0.6 + this._interactionRotation;
 
     // Le globe interne tourne un peu plus vite (effet de rotation terrestre)
     if (this._globeMesh) {
@@ -88,6 +91,14 @@ export default class Scene1990 {
 
     // Oscillation verticale
     this.worldGroup.position.y = Math.sin(progress * Math.PI) * 0.15;
+  }
+
+  /**
+   * Applique la rotation d'interaction utilisateur (drag horizontal).
+   * @param {number} rotationY — Rotation en radians
+   */
+  onInteraction(rotationY) {
+    this._interactionRotation = rotationY;
   }
 
   dispose() {

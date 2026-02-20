@@ -48,6 +48,9 @@ export default class Scene1980 {
     /** @type {number} */
     this._scrollProgress = 0;
 
+    /** @type {number} Rotation ajoutée par l'interaction utilisateur (drag) */
+    this._interactionRotation = 0;
+
     /** @type {boolean} */
     this._initialized = false;
   }
@@ -77,11 +80,19 @@ export default class Scene1980 {
     this.gameboyGroup.scale.setScalar(scale);
     this.gameboyGroup.visible = entranceProgress > 0.01;
 
-    // Rotation douce
-    this.gameboyGroup.rotation.y = -0.3 + progress * Math.PI * 0.6;
+    // Rotation douce + interaction utilisateur
+    this.gameboyGroup.rotation.y = -0.3 + progress * Math.PI * 0.6 + this._interactionRotation;
 
     // Oscillation verticale
     this.gameboyGroup.position.y = Math.sin(progress * Math.PI) * 0.15;
+  }
+
+  /**
+   * Applique la rotation d'interaction utilisateur (drag horizontal).
+   * @param {number} rotationY — Rotation en radians
+   */
+  onInteraction(rotationY) {
+    this._interactionRotation = rotationY;
   }
 
   dispose() {

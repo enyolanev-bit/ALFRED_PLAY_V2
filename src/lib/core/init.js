@@ -7,6 +7,7 @@
 
 import { scrollEngine } from './ScrollEngine.js';
 import { audioManager } from './AudioManager.js';
+import { interactionHandler } from './InteractionHandler.js';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -135,6 +136,9 @@ async function initThreeJS() {
   if (decadeSections.length > 0) {
     sceneLoader.observeSections(decadeSections);
   }
+
+  // Initialiser l'InteractionHandler (rotation drag/touch sur les objets 3D)
+  interactionHandler.init(sceneManager);
 
   // Exposer les infos de debug sur window (dev only)
   if (import.meta.env.DEV) {
