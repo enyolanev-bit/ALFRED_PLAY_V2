@@ -10,7 +10,7 @@ export const DECADES = [
     title: "L'aube de l'interaction",
     subtitle: 'La souris d\'Engelbart',
     model: '/models/souris-1960.glb',
-    fallbackImage: '/images/fallback/fallback-1960.webp',
+    fallbackImage: '/images/fallback/fallback-1960.svg',
     audio: '/audio/ambiance-1960.mp3',
     colors: {
       background: '#1a1a2e',
@@ -19,7 +19,7 @@ export const DECADES = [
     },
     personalStory: '',
     historicalText: '',
-    sceneModule: null, // Ajouté dans STORY-003 : () => import('../../lib/scenes/Scene1960.js')
+    sceneModule: () => import('../scenes/Scene1960.js'),
   },
   {
     id: '1970',
