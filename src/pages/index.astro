@@ -1,0 +1,33 @@
+---
+/**
+ * Page principale — Assemble toutes les sections du voyage.
+ * Intro → 7 décennies (1960-2020) → Contact
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import IntroSection from '../components/sections/IntroSection.astro';
+import DecadeSection from '../components/sections/DecadeSection.astro';
+import ContactSection from '../components/sections/ContactSection.astro';
+import { DECADES } from '../lib/config/decades.js';
+---
+
+<BaseLayout>
+  <!-- Intro -->
+  <IntroSection />
+
+  <!-- 7 décennies -->
+  {DECADES.map((decade) => (
+    <DecadeSection
+      id={decade.id}
+      label={decade.label}
+      title={decade.title}
+      subtitle={decade.subtitle}
+      bgColor={decade.colors.background}
+      accentColor={decade.colors.accent}
+      textColor={decade.colors.text}
+    />
+  ))}
+
+  <!-- Contact -->
+  <ContactSection />
+</BaseLayout>

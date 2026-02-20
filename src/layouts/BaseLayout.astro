@@ -1,0 +1,58 @@
+---
+/**
+ * BaseLayout — Layout principal avec le canvas WebGL global.
+ * Le canvas est en position fixed (z-index: 0), le contenu HTML scrolle par-dessus.
+ */
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'ALFRED PLAY — L\'histoire de l\'informatique',
+  description = 'Un voyage immersif à travers l\'histoire de l\'informatique, de 1960 à 2026.',
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+
+    <!-- Fonts — Inter + Space Grotesk -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Couche 1 — Canvas WebGL (position: fixed, z-index: 0) -->
+    <canvas id="webgl-canvas" aria-hidden="true"></canvas>
+
+    <!-- Couche 2 — Contenu HTML scrollable (z-index: 1) -->
+    <main>
+      <slot />
+    </main>
+
+    <!-- Couche 3 — Overlay UI (z-index: 2) -->
+    <div class="ui-overlay" id="ui-overlay">
+      <!-- AudioToggle et ProgressBar seront ajoutés ici dans les stories suivantes -->
+    </div>
+
+    <!-- Script d'initialisation — chargé côté client -->
+    <script>
+      import '../lib/core/init.js';
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  @import '../styles/global.css';
+</style>

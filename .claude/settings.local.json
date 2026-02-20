@@ -6,7 +6,16 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:www.utsubo.com)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git config:*)",
+      "Bash(git clone:*)",
+      "Bash(git push:*)",
+      "Bash(git checkout:*)",
+      "mcp__claude_ai_Context7__resolve-library-id",
+      "mcp__claude_ai_Context7__query-docs",
+      "Bash(npm install:*)",
+      "Bash(npx astro:*)",
+      "Bash(node -e:*)"
     ]
   }
 }
