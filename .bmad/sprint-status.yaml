@@ -1,0 +1,150 @@
+version: "6.0.0"
+project_name: "ALFRED_PLAY V2"
+project_level: 2
+current_sprint: 1
+sprint_plan_path: "docs/sprint-plan-alfred-play-v2-2026-02-20.md"
+
+sprints:
+  - sprint_number: 1
+    start_date: "2026-02-24"
+    end_date: "2026-03-07"
+    capacity_points: 12
+    committed_points: 8
+    completed_points: 0
+    status: "not_started"
+    goal: "Squelette HTML complet du site avec scroll vertical fonctionnel, intro et contact"
+    stories:
+      - story_id: "STORY-001"
+        title: "Init Astro + sections + scroll"
+        points: 5
+        status: "not_started"
+        assigned_to: null
+      - story_id: "STORY-002"
+        title: "Ecran d'intro + section contact"
+        points: 3
+        status: "not_started"
+        assigned_to: null
+
+  - sprint_number: 2
+    start_date: "2026-03-10"
+    end_date: "2026-03-21"
+    capacity_points: 12
+    committed_points: 10
+    completed_points: 0
+    status: "not_started"
+    goal: "Pipeline 3D complet + premiere decennie avec objet 3D (GO/NO-GO mobile)"
+    stories:
+      - story_id: "STORY-003"
+        title: "SceneManager + SceneLoader"
+        points: 5
+        status: "not_started"
+        assigned_to: null
+      - story_id: "STORY-004"
+        title: "Scene 3D 1960 - Souris d'Engelbart"
+        points: 5
+        status: "not_started"
+        assigned_to: null
+
+  - sprint_number: 3
+    start_date: "2026-03-24"
+    end_date: "2026-04-04"
+    capacity_points: 12
+    committed_points: 10
+    completed_points: 0
+    status: "not_started"
+    goal: "Audio immersif complet + textes historiques pour toutes les decennies"
+    stories:
+      - story_id: "STORY-005"
+        title: "AudioManager + sons par decennie"
+        points: 5
+        status: "not_started"
+        assigned_to: null
+      - story_id: "STORY-009"
+        title: "Textes historiques par decennie"
+        points: 5
+        status: "not_started"
+        assigned_to: null
+
+  - sprint_number: 4
+    start_date: "2026-04-07"
+    end_date: "2026-04-18"
+    capacity_points: 12
+    committed_points: 11
+    completed_points: 0
+    status: "not_started"
+    goal: "4 decennies 3D completes (1960-1990) + interaction utilisateur"
+    stories:
+      - story_id: "STORY-006"
+        title: "Scenes 3D 1970-1980-1990"
+        points: 8
+        status: "not_started"
+        assigned_to: null
+      - story_id: "STORY-008"
+        title: "Interaction 3D utilisateur"
+        points: 3
+        status: "not_started"
+        assigned_to: null
+
+  - sprint_number: 5
+    start_date: "2026-04-21"
+    end_date: "2026-05-02"
+    capacity_points: 12
+    committed_points: 11
+    completed_points: 0
+    status: "not_started"
+    goal: "7 decennies 3D completes + histoire personnelle de Nevil integree"
+    stories:
+      - story_id: "STORY-007"
+        title: "Scenes 3D 2000-2010-2020"
+        points: 8
+        status: "not_started"
+        assigned_to: null
+      - story_id: "STORY-010"
+        title: "Histoire personnelle de Nevil"
+        points: 3
+        status: "not_started"
+        assigned_to: null
+
+  - sprint_number: 6
+    start_date: "2026-05-05"
+    end_date: "2026-05-16"
+    capacity_points: 12
+    committed_points: 11
+    completed_points: 0
+    status: "not_started"
+    goal: "Polish, SEO, analytics, easter eggs - LANCEMENT"
+    stories:
+      - story_id: "STORY-011"
+        title: "Indicateur de progression"
+        points: 3
+        status: "not_started"
+        assigned_to: null
+      - story_id: "STORY-012"
+        title: "Enrichissements desktop"
+        points: 3
+        status: "not_started"
+        assigned_to: null
+      - story_id: "STORY-013"
+        title: "SEO, OG & Analytics"
+        points: 3
+        status: "not_started"
+        assigned_to: null
+      - story_id: "STORY-014"
+        title: "Easter eggs"
+        points: 2
+        status: "not_started"
+        assigned_to: null
+
+velocity:
+  sprint_1: null
+  sprint_2: null
+  sprint_3: null
+  sprint_4: null
+  sprint_5: null
+  sprint_6: null
+  rolling_average: null
+
+team:
+  size: 1
+  sprint_length_weeks: 2
+  capacity_per_sprint: 12
