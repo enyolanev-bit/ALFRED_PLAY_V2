@@ -1,30 +1,51 @@
 ---
 /**
- * IntroSection — Écran d'accueil avec CTA "Commencer le voyage".
- * Premier contact visuel, doit donner le "wow" immédiat.
- * Le clic sur le CTA débloquera l'AudioContext (STORY-002).
+ * IntroSection — Écran d'accueil immersif avec effet "wow".
+ * Premier contact visuel du visiteur : animations GSAP, fond animé, CTA impactant.
+ * Le clic sur le CTA débloque l'AudioContext et scrolle vers la première décennie.
  */
 ---
 
 <section class="intro-section" id="intro" aria-label="Accueil">
+  <!-- Fond animé — grille de lignes subtiles -->
+  <div class="intro-section__bg" aria-hidden="true">
+    <div class="intro-section__grid"></div>
+    <div class="intro-section__glow"></div>
+  </div>
+
   <div class="intro-section__content">
-    <h1 class="intro-section__title">
-      <span class="intro-section__title-line">L'histoire de</span>
-      <span class="intro-section__title-line intro-section__title-line--accent">l'informatique</span>
-    </h1>
-    <p class="intro-section__subtitle">
-      Un voyage immersif de 1960 à aujourd'hui
+    <p class="intro-section__eyebrow" data-intro-anim>
+      1960 → 2026
     </p>
-    <button class="intro-section__cta" id="cta-start" type="button" aria-label="Commencer le voyage">
-      Commencer le voyage
+    <h1 class="intro-section__title">
+      <span class="intro-section__title-line" data-intro-anim>L'histoire de</span>
+      <span class="intro-section__title-line intro-section__title-line--accent" data-intro-anim>l'informatique</span>
+    </h1>
+    <p class="intro-section__subtitle" data-intro-anim>
+      Un voyage immersif à travers 7&nbsp;décennies d'innovation
+    </p>
+    <button
+      class="intro-section__cta"
+      id="cta-start"
+      type="button"
+      aria-label="Commencer le voyage"
+      data-intro-anim
+    >
+      <span class="intro-section__cta-text">Commencer le voyage</span>
+      <span class="intro-section__cta-icon" aria-hidden="true">→</span>
     </button>
-    <div class="intro-section__scroll-hint" aria-hidden="true">
-      <span class="intro-section__scroll-arrow">↓</span>
-    </div>
+  </div>
+
+  <!-- Indicateur de scroll — visible après le CTA -->
+  <div class="intro-section__scroll-hint" id="scroll-hint" aria-hidden="true">
+    <div class="intro-section__scroll-line"></div>
+    <span class="intro-section__scroll-label">Scrollez</span>
   </div>
 </section>
 
 <style>
+  /* === IntroSection — Écran d'accueil === */
+
   .intro-section {
     position: relative;
     width: 100%;
@@ -36,21 +57,82 @@
     align-items: center;
     padding: 1.5rem;
     text-align: center;
-    background: linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 100%);
+    overflow: hidden;
+    background: #0a0a0a;
   }
 
+  /* --- Fond animé --- */
+
+  .intro-section__bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* Grille de lignes subtiles — effet technologique */
+  .intro-section__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(233, 69, 96, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(233, 69, 96, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 70%);
+  }
+
+  /* Halo lumineux central — accent chaud */
+  .intro-section__glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 600px;
+    height: 600px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(233, 69, 96, 0.12) 0%, transparent 70%);
+    animation: glow-pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+  }
+
+  /* --- Contenu principal --- */
+
   .intro-section__content {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1.25rem;
+    z-index: 1;
   }
 
+  /* Éléments animés — cachés par défaut, révélés par GSAP */
+  [data-intro-anim] {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  /* Eyebrow — timeline hint */
+  .intro-section__eyebrow {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    opacity: 0;
+  }
+
+  /* Titre principal */
   .intro-section__title {
     font-family: var(--font-display);
-    font-size: clamp(2rem, 8vw, 5rem);
+    font-size: clamp(2.5rem, 10vw, 6rem);
     font-weight: 700;
-    line-height: 1.1;
+    line-height: 1.05;
     letter-spacing: -0.03em;
   }
 
@@ -61,17 +143,26 @@
 
   .intro-section__title-line--accent {
     color: var(--color-accent);
+    text-shadow: 0 0 40px rgba(233, 69, 96, 0.3);
   }
 
+  /* Sous-titre */
   .intro-section__subtitle {
     font-size: clamp(1rem, 3vw, 1.25rem);
-    opacity: 0.7;
-    max-width: 30ch;
+    color: rgba(234, 234, 234, 0.6);
+    max-width: 28ch;
+    line-height: 1.5;
   }
 
+  /* --- CTA "Commencer le voyage" --- */
+
   .intro-section__cta {
-    margin-top: 1rem;
-    padding: 1rem 2.5rem;
+    position: relative;
+    margin-top: 1.5rem;
+    padding: 1.1rem 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
     font-family: var(--font-body);
     font-size: 1.125rem;
     font-weight: 600;
@@ -80,30 +171,91 @@
     border: none;
     border-radius: 9999px;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    box-shadow: 0 4px 25px rgba(233, 69, 96, 0.3);
   }
 
   .intro-section__cta:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 30px rgba(233, 69, 96, 0.4);
+    transform: scale(1.06);
+    box-shadow: 0 6px 40px rgba(233, 69, 96, 0.5);
   }
 
   .intro-section__cta:active {
-    transform: scale(0.98);
+    transform: scale(0.97);
   }
+
+  .intro-section__cta-icon {
+    display: inline-block;
+    transition: transform 0.3s ease;
+  }
+
+  .intro-section__cta:hover .intro-section__cta-icon {
+    transform: translateX(4px);
+  }
+
+  /* Anneau pulsant autour du CTA */
+  .intro-section__cta::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 9999px;
+    border: 2px solid rgba(233, 69, 96, 0.4);
+    animation: cta-ring 2.5s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes cta-ring {
+    0%, 100% { opacity: 0; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.08); }
+  }
+
+  /* --- Indicateur de scroll --- */
 
   .intro-section__scroll-hint {
-    margin-top: 2rem;
-    opacity: 0.4;
-    animation: bounce 2s infinite;
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0; /* Révélé par GSAP après le CTA */
   }
 
-  .intro-section__scroll-arrow {
-    font-size: 1.5rem;
+  .intro-section__scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(180deg, var(--color-accent), transparent);
+    animation: scroll-line 2s ease-in-out infinite;
   }
 
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(8px); }
+  @keyframes scroll-line {
+    0% { transform: scaleY(0); transform-origin: top; }
+    50% { transform: scaleY(1); transform-origin: top; }
+    51% { transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+
+  .intro-section__scroll-label {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(234, 234, 234, 0.4);
+  }
+
+  /* --- Responsive tablet (768px+) --- */
+
+  @media (min-width: 768px) {
+    .intro-section__glow {
+      width: 900px;
+      height: 900px;
+    }
+
+    .intro-section__cta {
+      padding: 1.25rem 3rem;
+      font-size: 1.25rem;
+    }
   }
 </style>

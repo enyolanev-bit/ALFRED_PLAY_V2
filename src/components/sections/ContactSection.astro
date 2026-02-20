@@ -1,40 +1,56 @@
 ---
 /**
- * ContactSection — Section finale après le voyage.
- * CTA contact avec LinkedIn + email. Conclusion naturelle du parcours.
- * Le contenu sera enrichi dans STORY-002.
+ * ContactSection — Conclusion naturelle du voyage.
+ * Section finale après les 7 décennies : CTA contact engageant.
+ * Liens : email + LinkedIn. Animations GSAP au scroll.
  */
 ---
 
 <section class="contact-section" id="contact" aria-label="Contact">
   <div class="contact-section__content">
-    <h2 class="contact-section__title">Et maintenant ?</h2>
-    <p class="contact-section__text">
-      Le voyage à travers l'histoire de l'informatique vous a plu ?<br />
-      Parlons de votre prochain projet.
+    <p class="contact-section__eyebrow" data-contact-anim>Le voyage continue</p>
+    <h2 class="contact-section__title" data-contact-anim>
+      Et maintenant,<br />
+      <span class="contact-section__title--accent">écrivons la suite.</span>
+    </h2>
+    <p class="contact-section__text" data-contact-anim>
+      De la souris d'Engelbart à l'intelligence artificielle, l'informatique
+      n'a jamais cessé de réinventer le monde. Votre prochain projet en fait partie.
     </p>
-    <div class="contact-section__links">
+    <div class="contact-section__links" data-contact-anim>
       <a
         href="mailto:contact@nevil.dev"
-        class="contact-section__link"
-        aria-label="Envoyer un email"
+        class="contact-section__link contact-section__link--primary"
+        aria-label="Envoyer un email à Nevil"
       >
-        ✉ Email
+        <span class="contact-section__link-icon" aria-hidden="true">&#9993;</span>
+        Envoyer un email
       </a>
       <a
         href="https://linkedin.com/in/nevil"
-        class="contact-section__link"
+        class="contact-section__link contact-section__link--secondary"
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Profil LinkedIn"
+        aria-label="Profil LinkedIn de Nevil"
       >
-        → LinkedIn
+        <span class="contact-section__link-icon" aria-hidden="true">&#8599;</span>
+        LinkedIn
       </a>
     </div>
+  </div>
+
+  <!-- Ligne décorative de séparation -->
+  <div class="contact-section__footer" aria-hidden="true">
+    <div class="contact-section__divider"></div>
+    <p class="contact-section__credit">
+      ALFRED PLAY &mdash; Un voyage de 1960 à 2026
+    </p>
   </div>
 </section>
 
 <style>
+  /* === ContactSection — Conclusion du voyage === */
+
   .contact-section {
     position: relative;
     width: 100%;
@@ -44,9 +60,9 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 1.5rem;
+    padding: 2rem 1.5rem;
     text-align: center;
-    background: linear-gradient(180deg, #0a0a1a 0%, #0a0a0a 100%);
+    background: linear-gradient(180deg, #0a0a1a 0%, #050510 100%);
   }
 
   .contact-section__content {
@@ -54,44 +70,133 @@
     flex-direction: column;
     align-items: center;
     gap: 1.5rem;
-    max-width: 30rem;
+    max-width: 36rem;
   }
 
+  /* Éléments animés — cachés par défaut, révélés par GSAP */
+  [data-contact-anim] {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  /* Eyebrow */
+  .contact-section__eyebrow {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  /* Titre */
   .contact-section__title {
     font-family: var(--font-display);
-    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-size: clamp(2rem, 7vw, 3.75rem);
     font-weight: 700;
     line-height: 1.1;
+    letter-spacing: -0.02em;
   }
 
+  .contact-section__title--accent {
+    color: var(--color-accent);
+  }
+
+  /* Texte */
   .contact-section__text {
     font-size: clamp(1rem, 2.5vw, 1.125rem);
-    opacity: 0.7;
+    color: rgba(234, 234, 234, 0.6);
     line-height: 1.7;
+    max-width: 34ch;
   }
+
+  /* --- Liens de contact --- */
 
   .contact-section__links {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
     justify-content: center;
-    margin-top: 1rem;
+    margin-top: 0.5rem;
   }
 
   .contact-section__link {
-    padding: 0.875rem 2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
     font-family: var(--font-body);
     font-size: 1rem;
     font-weight: 600;
     color: #fff;
     text-decoration: none;
-    border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 9999px;
-    transition: border-color 0.2s ease, background 0.2s ease;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;
   }
 
-  .contact-section__link:hover {
+  /* Lien primaire — email (rempli) */
+  .contact-section__link--primary {
+    background: var(--color-accent);
+    box-shadow: 0 4px 20px rgba(233, 69, 96, 0.25);
+  }
+
+  .contact-section__link--primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 30px rgba(233, 69, 96, 0.4);
+  }
+
+  /* Lien secondaire — LinkedIn (bordure) */
+  .contact-section__link--secondary {
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    background: transparent;
+  }
+
+  .contact-section__link--secondary:hover {
+    transform: scale(1.05);
     border-color: var(--color-accent);
-    background: rgba(233, 69, 96, 0.1);
+    background: rgba(233, 69, 96, 0.08);
+  }
+
+  .contact-section__link:active {
+    transform: scale(0.97);
+  }
+
+  .contact-section__link-icon {
+    font-size: 1.1em;
+    line-height: 1;
+  }
+
+  /* --- Footer / crédit --- */
+
+  .contact-section__footer {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .contact-section__divider {
+    width: 40px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .contact-section__credit {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(234, 234, 234, 0.25);
+  }
+
+  /* --- Responsive tablet (768px+) --- */
+
+  @media (min-width: 768px) {
+    .contact-section__link {
+      padding: 1.1rem 2.5rem;
+      font-size: 1.0625rem;
+    }
   }
 </style>
