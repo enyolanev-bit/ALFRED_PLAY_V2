@@ -1,8 +1,9 @@
 ---
 /**
  * DecadeSection — Composant réutilisable pour chaque décennie.
- * Affiche le titre, sous-titre et un conteneur pour le contenu futur.
- * Les textes historiques et l'histoire personnelle seront ajoutés dans les stories suivantes.
+ * Affiche le titre, sous-titre, et une image fallback pour GPU tier 0.
+ * La scène 3D est rendue dans le canvas global (couche 1), pas ici.
+ * Les textes historiques seront ajoutés dans STORY-009.
  */
 
 interface Props {
@@ -13,9 +14,10 @@ interface Props {
   bgColor: string;
   accentColor: string;
   textColor: string;
+  fallbackImage?: string;
 }
 
-const { id, label, title, subtitle, bgColor, accentColor, textColor } = Astro.props;
+const { id, label, title, subtitle, bgColor, accentColor, textColor, fallbackImage } = Astro.props;
 ---
 
 <section
@@ -29,6 +31,18 @@ const { id, label, title, subtitle, bgColor, accentColor, textColor } = Astro.pr
     <span class="section-decade__label">{label}</span>
     <h2 class="section-decade__title">{title}</h2>
     <p class="section-decade__subtitle">{subtitle}</p>
+
+    {/* Image fallback pour GPU tier 0 (masquée par défaut, visible si no-webgl) */}
+    {fallbackImage && (
+      <img
+        class="section-decade__fallback"
+        src={fallbackImage}
+        alt={`${title} — ${subtitle}`}
+        loading="lazy"
+        width="400"
+        height="300"
+      />
+    )}
   </div>
 </section>
 
@@ -67,5 +81,19 @@ const { id, label, title, subtitle, bgColor, accentColor, textColor } = Astro.pr
   .section-decade__subtitle {
     font-size: clamp(1rem, 2.5vw, 1.25rem);
     opacity: 0.7;
+  }
+
+  /* Image fallback — masquée par défaut, visible quand body a .no-webgl */
+  .section-decade__fallback {
+    display: none;
+    max-width: 100%;
+    height: auto;
+    margin-top: 1.5rem;
+    border-radius: 0.5rem;
+    opacity: 0.85;
+  }
+
+  :global(body.no-webgl) .section-decade__fallback {
+    display: block;
   }
 </style>

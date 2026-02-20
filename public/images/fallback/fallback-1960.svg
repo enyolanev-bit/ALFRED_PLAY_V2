@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <!-- Fallback 2D pour la souris d'Engelbart (GPU tier 0) -->
+  <defs>
+    <radialGradient id="bg-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2a1a3e" />
+      <stop offset="100%" stop-color="#1a1a2e" />
+    </radialGradient>
+  </defs>
+  <!-- Fond -->
+  <rect width="400" height="300" fill="url(#bg-glow)" />
+  <!-- Corps de la souris (boîtier en bois) -->
+  <rect x="130" y="110" width="140" height="80" rx="6" fill="#8b6914" stroke="#5c4a0e" stroke-width="2" />
+  <!-- Fond du boîtier -->
+  <rect x="132" y="180" width="136" height="10" rx="3" fill="#5c4a0e" />
+  <!-- Bouton rouge -->
+  <rect x="185" y="105" width="50" height="12" rx="3" fill="#e94560" />
+  <!-- Câble -->
+  <path d="M270 140 Q310 120 330 90" fill="none" stroke="#2a2a2a" stroke-width="4" stroke-linecap="round" />
+  <!-- Roulettes (petits cercles sous la souris) -->
+  <circle cx="200" cy="195" r="8" fill="#3d3d3d" stroke="#555" stroke-width="1" />
+  <!-- Label -->
+  <text x="200" y="250" text-anchor="middle" fill="#eaeaea" font-family="sans-serif" font-size="14" opacity="0.6">Souris d'Engelbart · 1968</text>
+</svg>
