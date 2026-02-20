@@ -43,6 +43,9 @@ export default class Scene1960 {
     /** @type {number} Progression du scroll (0-1) */
     this._scrollProgress = 0;
 
+    /** @type {number} Rotation ajoutée par l'interaction utilisateur (drag) */
+    this._interactionRotation = 0;
+
     /** @type {boolean} La scène a-t-elle été initialisée ? */
     this._initialized = false;
   }
@@ -80,8 +83,8 @@ export default class Scene1960 {
     this.mouseGroup.scale.setScalar(scale);
     this.mouseGroup.visible = entranceProgress > 0.01;
 
-    // Rotation douce selon la progression globale
-    this.mouseGroup.rotation.y = -0.3 + progress * Math.PI * 0.6;
+    // Rotation douce selon la progression globale + interaction utilisateur
+    this.mouseGroup.rotation.y = -0.3 + progress * Math.PI * 0.6 + this._interactionRotation;
 
     // Légère oscillation verticale pour donner de la vie
     this.mouseGroup.position.y = Math.sin(progress * Math.PI) * 0.15;
@@ -91,6 +94,14 @@ export default class Scene1960 {
    * Libère les ressources spécifiques à cette scène.
    * Le dispose des géométries/matériaux est géré par dispose.js via SceneLoader.
    */
+  /**
+   * Applique la rotation d'interaction utilisateur (drag horizontal).
+   * @param {number} rotationY — Rotation en radians
+   */
+  onInteraction(rotationY) {
+    this._interactionRotation = rotationY;
+  }
+
   dispose() {
     this.mouseGroup = null;
     this._initialized = false;
