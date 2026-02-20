@@ -1,0 +1,148 @@
+---
+/**
+ * AudioToggle — Bouton mute/unmute toujours visible dans l'overlay UI.
+ *
+ * Affiche une icône speaker on/off selon l'état audio.
+ * Dispatche l'événement audio:toggle au clic.
+ * Écoute audio:statechange pour synchroniser son état visuel.
+ * Masqué tant que l'audio n'est pas débloqué (CTA cliqué).
+ *
+ * Accessible : aria-label, focus visible, keyboard nav.
+ */
+---
+
+<button
+  class="audio-toggle"
+  id="audio-toggle"
+  type="button"
+  aria-label="Activer/désactiver le son"
+  title="Son on/off"
+  hidden
+>
+  <!-- Icône speaker ON -->
+  <svg class="audio-toggle__icon audio-toggle__icon--on" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+  </svg>
+
+  <!-- Icône speaker OFF (muted) -->
+  <svg class="audio-toggle__icon audio-toggle__icon--off" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+    <line x1="23" y1="9" x2="17" y2="15" />
+    <line x1="17" y1="9" x2="23" y2="15" />
+  </svg>
+</button>
+
+<script>
+  /**
+   * Script client du bouton AudioToggle.
+   * Gère l'affichage conditionnel et la synchronisation avec AudioManager.
+   */
+  const btn = document.getElementById('audio-toggle');
+  if (btn) {
+    // Afficher le bouton quand l'audio est débloqué
+    window.addEventListener('audio:unlocked', () => {
+      btn.hidden = false;
+    });
+
+    // Toggle au clic
+    btn.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('audio:toggle'));
+    });
+
+    // Synchroniser l'état visuel (muted/unmuted)
+    window.addEventListener('audio:statechange', (e) => {
+      const { muted } = e.detail;
+      btn.classList.toggle('is-muted', muted);
+      btn.setAttribute(
+        'aria-label',
+        muted ? 'Activer le son' : 'Désactiver le son'
+      );
+    });
+
+    // Charger l'état initial depuis sessionStorage
+    try {
+      const savedMuted = sessionStorage.getItem('alfred-audio-muted') === 'true';
+      if (savedMuted) {
+        btn.classList.add('is-muted');
+        btn.setAttribute('aria-label', 'Activer le son');
+      }
+    } catch {
+      // sessionStorage non disponible
+    }
+  }
+</script>
+
+<style>
+  .audio-toggle {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 100;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    color: #eaeaea;
+
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease, opacity 0.3s ease;
+  }
+
+  .audio-toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.08);
+  }
+
+  .audio-toggle:focus-visible {
+    outline: 2px solid #e94560;
+    outline-offset: 3px;
+  }
+
+  .audio-toggle:active {
+    transform: scale(0.95);
+  }
+
+  /* État par défaut : speaker ON visible, OFF masqué */
+  .audio-toggle__icon--off {
+    display: none;
+  }
+
+  .audio-toggle__icon--on {
+    display: block;
+  }
+
+  /* État muted : speaker OFF visible, ON masqué */
+  .audio-toggle.is-muted .audio-toggle__icon--on {
+    display: none;
+  }
+
+  .audio-toggle.is-muted .audio-toggle__icon--off {
+    display: block;
+  }
+
+  /* Responsive — légèrement plus petit sur mobile */
+  @media (max-width: 640px) {
+    .audio-toggle {
+      width: 2.5rem;
+      height: 2.5rem;
+      bottom: 1rem;
+      right: 1rem;
+    }
+
+    .audio-toggle__icon {
+      width: 20px;
+      height: 20px;
+    }
+  }
+</style>

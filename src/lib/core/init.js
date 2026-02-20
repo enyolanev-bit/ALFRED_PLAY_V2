@@ -1,11 +1,12 @@
 /**
  * init.js — Point d'entrée côté client.
  *
- * Initialise le ScrollEngine, le SceneManager (Three.js), le SceneLoader,
- * les animations GSAP de l'intro/contact, et l'AudioContext unlock.
+ * Initialise le ScrollEngine, l'AudioManager, le SceneManager (Three.js),
+ * le SceneLoader, les animations GSAP de l'intro/contact, et l'AudioContext unlock.
  */
 
 import { scrollEngine } from './ScrollEngine.js';
+import { audioManager } from './AudioManager.js';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -20,8 +21,8 @@ let sceneLoader = null;
 
 /**
  * Déblocage de l'AudioContext — satisfait la politique autoplay des navigateurs.
- * Crée un AudioContext et le résume immédiatement. Émet un événement custom
- * pour que le futur AudioManager (STORY-005) puisse s'y connecter.
+ * Crée un AudioContext et le résume immédiatement.
+ * Débloque l'AudioManager et émet un événement pour afficher le bouton audio.
  */
 function unlockAudioContext() {
   try {
@@ -35,10 +36,13 @@ function unlockAudioContext() {
       ctx.resume();
     }
 
-    // Stocker le contexte sur window pour que AudioManager puisse le récupérer
+    // Stocker le contexte sur window pour référence
     window.__audioContext = ctx;
 
-    // Événement custom pour les systèmes futurs
+    // Débloquer l'AudioManager (résume aussi le contexte Howler)
+    audioManager.unlock();
+
+    // Événement custom pour les composants UI (AudioToggle)
     window.dispatchEvent(new CustomEvent('audio:unlocked', { detail: { context: ctx } }));
   } catch (e) {
     // Pas de support AudioContext — l'expérience continue sans son
@@ -173,6 +177,9 @@ function setupCTA() {
 function init() {
   // Initialiser le smooth scroll (Lenis + GSAP + ScrollTrigger)
   scrollEngine.init();
+
+  // Initialiser l'AudioManager (écoute les événements decade:enter / audio:toggle)
+  audioManager.init();
 
   // Animations de l'intro (entrée au chargement)
   animateIntro();
