@@ -4,6 +4,8 @@
  * Le canvas est en position fixed (z-index: 0), le contenu HTML scrolle par-dessus.
  */
 
+import AudioToggle from '../components/ui/AudioToggle.astro';
+
 interface Props {
   title?: string;
   description?: string;
@@ -43,7 +45,7 @@ const {
 
     <!-- Couche 3 — Overlay UI (z-index: 2) -->
     <div class="ui-overlay" id="ui-overlay">
-      <!-- AudioToggle et ProgressBar seront ajoutés ici dans les stories suivantes -->
+      <AudioToggle />
     </div>
 
     <!-- Script d'initialisation — chargé côté client -->
