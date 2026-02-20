@@ -1,0 +1,71 @@
+---
+/**
+ * DecadeSection — Composant réutilisable pour chaque décennie.
+ * Affiche le titre, sous-titre et un conteneur pour le contenu futur.
+ * Les textes historiques et l'histoire personnelle seront ajoutés dans les stories suivantes.
+ */
+
+interface Props {
+  id: string;
+  label: string;
+  title: string;
+  subtitle: string;
+  bgColor: string;
+  accentColor: string;
+  textColor: string;
+}
+
+const { id, label, title, subtitle, bgColor, accentColor, textColor } = Astro.props;
+---
+
+<section
+  class="section-decade"
+  id={`decade-${id}`}
+  data-decade={id}
+  aria-label={`Décennie ${label}`}
+  style={`--decade-bg: ${bgColor}; --decade-accent: ${accentColor}; --decade-text: ${textColor};`}
+>
+  <div class="section-decade__inner">
+    <span class="section-decade__label">{label}</span>
+    <h2 class="section-decade__title">{title}</h2>
+    <p class="section-decade__subtitle">{subtitle}</p>
+  </div>
+</section>
+
+<style>
+  .section-decade {
+    background-color: var(--decade-bg);
+    color: var(--decade-text);
+  }
+
+  .section-decade__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.75rem;
+    max-width: 40rem;
+  }
+
+  .section-decade__label {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 15vw, 10rem);
+    font-weight: 700;
+    opacity: 0.1;
+    line-height: 1;
+    letter-spacing: -0.05em;
+  }
+
+  .section-decade__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--decade-accent);
+  }
+
+  .section-decade__subtitle {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    opacity: 0.7;
+  }
+</style>

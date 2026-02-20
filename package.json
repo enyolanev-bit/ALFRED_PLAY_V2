@@ -1,0 +1,19 @@
+{
+  "name": "alfred-play-v2",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Site immersif racontant l'histoire de l'informatique de 1960 à 2026",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^5.3.0",
+    "three": "^0.172.0",
+    "gsap": "^3.12.7",
+    "lenis": "^1.1.18",
+    "howler": "^2.2.4",
+    "detect-gpu": "^5.0.61"
+  }
+}

@@ -1,0 +1,126 @@
+/**
+ * Configuration des décennies — données centralisées pour tout le site.
+ * Chaque décennie définit ses couleurs, textes, assets et module scène 3D.
+ */
+
+export const DECADES = [
+  {
+    id: '1960',
+    label: '1960',
+    title: "L'aube de l'interaction",
+    subtitle: 'La souris d\'Engelbart',
+    model: '/models/souris-1960.glb',
+    fallbackImage: '/images/fallback/fallback-1960.webp',
+    audio: '/audio/ambiance-1960.mp3',
+    colors: {
+      background: '#1a1a2e',
+      accent: '#e94560',
+      text: '#eaeaea',
+    },
+    personalStory: '',
+    historicalText: '',
+    sceneModule: null, // Ajouté dans STORY-003 : () => import('../../lib/scenes/Scene1960.js')
+  },
+  {
+    id: '1970',
+    label: '1970',
+    title: "L'ère des terminaux",
+    subtitle: 'Le terminal VT100',
+    model: '/models/terminal-1970.glb',
+    fallbackImage: '/images/fallback/fallback-1970.webp',
+    audio: '/audio/ambiance-1970.mp3',
+    colors: {
+      background: '#0d1b0e',
+      accent: '#33ff33',
+      text: '#c8e6c9',
+    },
+    personalStory: '',
+    historicalText: '',
+    sceneModule: null, // Ajouté dans STORY-003
+  },
+  {
+    id: '1980',
+    label: '1980',
+    title: 'La révolution personnelle',
+    subtitle: 'Le Game Boy',
+    model: '/models/gameboy-1980.glb',
+    fallbackImage: '/images/fallback/fallback-1980.webp',
+    audio: '/audio/ambiance-1980.mp3',
+    colors: {
+      background: '#1a0a2e',
+      accent: '#ff6ec7',
+      text: '#f0e6ff',
+    },
+    personalStory: '',
+    historicalText: '',
+    sceneModule: null, // Ajouté dans STORY-003
+  },
+  {
+    id: '1990',
+    label: '1990',
+    title: 'Le monde connecté',
+    subtitle: 'Le modem & le Web',
+    model: '/models/globe-1990.glb',
+    fallbackImage: '/images/fallback/fallback-1990.webp',
+    audio: '/audio/ambiance-1990.mp3',
+    colors: {
+      background: '#0a1628',
+      accent: '#00bcd4',
+      text: '#e0f7fa',
+    },
+    personalStory: '',
+    historicalText: '',
+    sceneModule: null, // Ajouté dans STORY-003
+  },
+  {
+    id: '2000',
+    label: '2000',
+    title: 'La musique numérique',
+    subtitle: "L'iPod",
+    model: '/models/ipod-2000.glb',
+    fallbackImage: '/images/fallback/fallback-2000.webp',
+    audio: '/audio/ambiance-2000.mp3',
+    colors: {
+      background: '#f5f5f5',
+      accent: '#9e9e9e',
+      text: '#212121',
+    },
+    personalStory: '',
+    historicalText: '',
+    sceneModule: null, // Ajouté dans STORY-003
+  },
+  {
+    id: '2010',
+    label: '2010',
+    title: 'Le mobile change tout',
+    subtitle: "L'iPhone",
+    model: '/models/iphone-2010.glb',
+    fallbackImage: '/images/fallback/fallback-2010.webp',
+    audio: '/audio/ambiance-2010.mp3',
+    colors: {
+      background: '#1c1c1e',
+      accent: '#007aff',
+      text: '#f2f2f7',
+    },
+    personalStory: '',
+    historicalText: '',
+    sceneModule: null, // Ajouté dans STORY-003
+  },
+  {
+    id: '2020',
+    label: '2020',
+    title: "L'intelligence artificielle",
+    subtitle: 'Le cerveau IA',
+    model: '/models/cerveau-2020.glb',
+    fallbackImage: '/images/fallback/fallback-2020.webp',
+    audio: '/audio/ambiance-2020.mp3',
+    colors: {
+      background: '#0a0a1a',
+      accent: '#7c4dff',
+      text: '#e8eaf6',
+    },
+    personalStory: '',
+    historicalText: '',
+    sceneModule: null, // Ajouté dans STORY-003
+  },
+];
