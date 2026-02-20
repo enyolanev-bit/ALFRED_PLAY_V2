@@ -10,5 +10,9 @@ export default defineConfig({
     optimizeDeps: {
       include: ['three', 'gsap', 'lenis', 'howler', 'detect-gpu'],
     },
+    build: {
+      // Three.js (~530KB min) dépasse le seuil par défaut — c'est attendu
+      chunkSizeWarningLimit: 600,
+    },
   },
 });
