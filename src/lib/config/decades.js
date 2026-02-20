@@ -27,7 +27,7 @@ export const DECADES = [
     title: "L'ère des terminaux",
     subtitle: 'Le terminal VT100',
     model: '/models/terminal-1970.glb',
-    fallbackImage: '/images/fallback/fallback-1970.webp',
+    fallbackImage: '/images/fallback/fallback-1970.svg',
     audio: '/audio/ambiance-1970.mp3',
     colors: {
       background: '#0d1b0e',
@@ -36,7 +36,7 @@ export const DECADES = [
     },
     personalStory: '',
     historicalText: '',
-    sceneModule: null, // Ajouté dans STORY-003
+    sceneModule: () => import('../scenes/Scene1970.js'),
   },
   {
     id: '1980',
@@ -44,7 +44,7 @@ export const DECADES = [
     title: 'La révolution personnelle',
     subtitle: 'Le Game Boy',
     model: '/models/gameboy-1980.glb',
-    fallbackImage: '/images/fallback/fallback-1980.webp',
+    fallbackImage: '/images/fallback/fallback-1980.svg',
     audio: '/audio/ambiance-1980.mp3',
     colors: {
       background: '#1a0a2e',
@@ -53,7 +53,7 @@ export const DECADES = [
     },
     personalStory: '',
     historicalText: '',
-    sceneModule: null, // Ajouté dans STORY-003
+    sceneModule: () => import('../scenes/Scene1980.js'),
   },
   {
     id: '1990',
@@ -61,7 +61,7 @@ export const DECADES = [
     title: 'Le monde connecté',
     subtitle: 'Le modem & le Web',
     model: '/models/globe-1990.glb',
-    fallbackImage: '/images/fallback/fallback-1990.webp',
+    fallbackImage: '/images/fallback/fallback-1990.svg',
     audio: '/audio/ambiance-1990.mp3',
     colors: {
       background: '#0a1628',
@@ -70,7 +70,7 @@ export const DECADES = [
     },
     personalStory: '',
     historicalText: '',
-    sceneModule: null, // Ajouté dans STORY-003
+    sceneModule: () => import('../scenes/Scene1990.js'),
   },
   {
     id: '2000',

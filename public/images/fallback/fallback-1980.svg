@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <!-- Fallback 2D pour le Game Boy (GPU tier 0) -->
+  <defs>
+    <radialGradient id="bg-glow-80" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2a1a3e" />
+      <stop offset="100%" stop-color="#1a0a2e" />
+    </radialGradient>
+  </defs>
+  <!-- Fond -->
+  <rect width="400" height="300" fill="url(#bg-glow-80)" />
+  <!-- Corps Game Boy -->
+  <rect x="140" y="20" width="120" height="210" rx="10" fill="#c8c0b8" stroke="#8a8580" stroke-width="2" />
+  <!-- Partie basse (grip) -->
+  <rect x="140" y="165" width="120" height="65" rx="0 0 10 10" fill="#8a8580" />
+  <!-- Cadre écran -->
+  <rect x="158" y="45" width="84" height="72" rx="4" fill="#5c5852" />
+  <!-- Écran -->
+  <rect x="164" y="51" width="72" height="58" rx="2" fill="#8b9b2f" />
+  <!-- Label SCREEN -->
+  <text x="200" y="42" text-anchor="middle" fill="#5c5852" font-family="sans-serif" font-size="7" font-weight="bold">DOT MATRIX</text>
+  <!-- D-Pad -->
+  <rect x="155" y="140" width="30" height="10" rx="2" fill="#2a2a2a" />
+  <rect x="165" y="130" width="10" height="30" rx="2" fill="#2a2a2a" />
+  <!-- Boutons A/B -->
+  <circle cx="235" cy="140" r="8" fill="#8a2252" />
+  <circle cx="220" cy="152" r="8" fill="#8a2252" />
+  <text x="235" y="143" text-anchor="middle" fill="#fff" font-family="sans-serif" font-size="8" font-weight="bold">A</text>
+  <text x="220" y="155" text-anchor="middle" fill="#fff" font-family="sans-serif" font-size="8" font-weight="bold">B</text>
+  <!-- Start/Select -->
+  <rect x="178" y="172" width="18" height="5" rx="2" fill="#6a6560" transform="rotate(-25, 187, 174)" />
+  <rect x="196" y="172" width="18" height="5" rx="2" fill="#6a6560" transform="rotate(-25, 205, 174)" />
+  <!-- Grille speaker -->
+  <line x1="228" y1="185" x2="245" y2="195" stroke="#a8a098" stroke-width="2" />
+  <line x1="228" y1="190" x2="245" y2="200" stroke="#a8a098" stroke-width="2" />
+  <line x1="228" y1="195" x2="245" y2="205" stroke="#a8a098" stroke-width="2" />
+  <!-- Label -->
+  <text x="200" y="260" text-anchor="middle" fill="#f0e6ff" font-family="sans-serif" font-size="14" opacity="0.6">Game Boy · 1989</text>
+</svg>
