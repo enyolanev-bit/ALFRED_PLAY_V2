@@ -78,19 +78,34 @@ function animateIntro() {
 }
 
 /**
- * Animations des textes historiques — révélation progressive au scroll (progressive disclosure).
- * Chaque texte apparaît en fade-in + slide-up quand sa section entre dans le viewport.
+ * Animations des textes historiques et personnels — révélation progressive au scroll.
+ * Le texte historique apparaît d'abord, puis l'histoire personnelle de Nevil suit avec un léger décalage.
  */
 function animateDecadeTexts() {
+  // Textes historiques — fade-in + slide-up scrub
   const textElements = document.querySelectorAll('[data-decade-text]');
-  if (!textElements.length) return;
-
   textElements.forEach((el) => {
     gsap.to(el, {
       scrollTrigger: {
         trigger: el.closest('.section-decade'),
         start: 'top 60%',
         end: 'top 20%',
+        scrub: 0.8,
+      },
+      opacity: 1,
+      y: 0,
+      ease: 'none',
+    });
+  });
+
+  // Histoires personnelles — apparaissent un peu après le texte historique
+  const personalElements = document.querySelectorAll('[data-decade-personal]');
+  personalElements.forEach((el) => {
+    gsap.to(el, {
+      scrollTrigger: {
+        trigger: el.closest('.section-decade'),
+        start: 'top 40%',
+        end: 'top 5%',
         scrub: 0.8,
       },
       opacity: 1,

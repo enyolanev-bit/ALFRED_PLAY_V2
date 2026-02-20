@@ -14,10 +14,11 @@ interface Props {
   accentColor: string;
   textColor: string;
   historicalText?: string;
+  personalStory?: string;
   fallbackImage?: string;
 }
 
-const { id, label, title, subtitle, bgColor, accentColor, textColor, historicalText, fallbackImage } = Astro.props;
+const { id, label, title, subtitle, bgColor, accentColor, textColor, historicalText, personalStory, fallbackImage } = Astro.props;
 ---
 
 <section
@@ -37,6 +38,14 @@ const { id, label, title, subtitle, bgColor, accentColor, textColor, historicalT
       <p class="section-decade__history" data-decade-text>
         {historicalText}
       </p>
+    )}
+
+    {/* Histoire personnelle de Nevil — visuellement distinct, ton personnel */}
+    {personalStory && (
+      <blockquote class="section-decade__personal" data-decade-personal>
+        <span class="section-decade__personal-tag">Mon histoire</span>
+        <p>{personalStory}</p>
+      </blockquote>
     )}
 
     {/* Image fallback pour GPU tier 0 (masquée par défaut, visible si no-webgl) */}
@@ -98,6 +107,37 @@ const { id, label, title, subtitle, bgColor, accentColor, textColor, historicalT
     margin-top: 1rem;
     opacity: 0;
     transform: translateY(1.5rem);
+  }
+
+  /* Histoire personnelle — visuellement distinct du texte historique */
+  .section-decade__personal {
+    position: relative;
+    font-size: clamp(0.9rem, 2vw, 1.05rem);
+    font-style: italic;
+    line-height: 1.75;
+    max-width: 30rem;
+    margin-top: 1.25rem;
+    padding: 1rem 1.25rem;
+    border-left: 3px solid var(--decade-accent);
+    text-align: left;
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+
+  .section-decade__personal p {
+    margin: 0;
+    opacity: 0.85;
+  }
+
+  .section-decade__personal-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-style: normal;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--decade-accent);
+    margin-bottom: 0.5rem;
   }
 
   /* Image fallback — masquée par défaut, visible quand body a .no-webgl */
