@@ -34,3 +34,11 @@ ALFRED_PLAY V2 est un site web immersif qui raconte l'histoire de l'informatique
 ## Conventions
 
 - Tous les commentaires dans le code doivent être rédigés **en français**
+
+## Leçons apprises
+
+1. Toujours sauvegarder avec `git commit` après chaque étape BMAD
+2. Utiliser **Plan Mode** (`Shift+Tab` x2) avant toute implémentation
+3. En fin de session, mettre à jour ce fichier (`CLAUDE.md`) avec les leçons du jour
+4. Le plugin **ui-ux-pro-max** est disponible pour le design system
+5. Le plugin **Superpowers** structure chaque session de code
