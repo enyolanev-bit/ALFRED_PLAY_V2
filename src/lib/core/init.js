@@ -1,8 +1,8 @@
 /**
  * init.js — Point d'entrée côté client.
  *
- * Initialise le ScrollEngine, les animations GSAP de l'intro et du contact,
- * et gère le déblocage de l'AudioContext via le CTA "Commencer le voyage".
+ * Initialise le ScrollEngine, le SceneManager (Three.js), le SceneLoader,
+ * les animations GSAP de l'intro/contact, et l'AudioContext unlock.
  */
 
 import { scrollEngine } from './ScrollEngine.js';
@@ -10,6 +10,13 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
+
+// SceneManager et SceneLoader sont importés dynamiquement pour code-splitting.
+// Three.js (~150KB gzip) n'est chargé qu'après interaction utilisateur.
+/** @type {import('./SceneManager.js').SceneManager | null} */
+let sceneManager = null;
+/** @type {import('./SceneLoader.js').SceneLoader | null} */
+let sceneLoader = null;
 
 /**
  * Déblocage de l'AudioContext — satisfait la politique autoplay des navigateurs.
@@ -45,7 +52,6 @@ function animateIntro() {
   const introElements = document.querySelectorAll('[data-intro-anim]');
   if (!introElements.length) return;
 
-  // Timeline d'entrée séquentielle
   const tl = gsap.timeline({ delay: 0.3 });
 
   tl.to(introElements, {
@@ -56,7 +62,6 @@ function animateIntro() {
     ease: 'power3.out',
   });
 
-  // Révéler l'indicateur de scroll après la séquence d'intro
   const scrollHint = document.getElementById('scroll-hint');
   if (scrollHint) {
     tl.to(scrollHint, {
@@ -89,7 +94,53 @@ function animateContact() {
 }
 
 /**
- * Gestion du CTA "Commencer le voyage" — unlock audio + scroll vers la première section.
+ * Initialise le pipeline 3D (SceneManager + SceneLoader).
+ * Appelé de façon lazy : après le CTA clic ou quand la première décennie est visible.
+ */
+let threeInitialized = false;
+
+async function initThreeJS() {
+  if (threeInitialized) return;
+  threeInitialized = true;
+
+  const canvas = document.getElementById('webgl-canvas');
+  if (!canvas) return;
+
+  // Import dynamique — Three.js n'est chargé qu'ici (code-splitting)
+  const [{ sceneManager: sm }, { sceneLoader: sl }] = await Promise.all([
+    import('./SceneManager.js'),
+    import('./SceneLoader.js'),
+  ]);
+  sceneManager = sm;
+  sceneLoader = sl;
+
+  // Initialiser le SceneManager (détection GPU + renderer + caméra)
+  const qualityResult = await sceneManager.init(canvas);
+
+  // Si tier 0 → pas de 3D, on reste en fallback 2D
+  if (qualityResult.tier === 0) {
+    document.body.classList.add('no-webgl');
+    return;
+  }
+
+  // Initialiser le SceneLoader (GLTFLoader + DRACOLoader singletons)
+  sceneLoader.init();
+
+  // Observer les sections décennies pour le préchargement / dispose
+  const decadeSections = document.querySelectorAll('.section-decade');
+  if (decadeSections.length > 0) {
+    sceneLoader.observeSections(decadeSections);
+  }
+
+  // Exposer les infos de debug sur window (dev only)
+  if (import.meta.env.DEV) {
+    window.__sceneManager = sceneManager;
+    window.__sceneLoader = sceneLoader;
+  }
+}
+
+/**
+ * Gestion du CTA "Commencer le voyage" — unlock audio + init Three.js + scroll.
  */
 function setupCTA() {
   const ctaButton = document.getElementById('cta-start');
@@ -99,7 +150,10 @@ function setupCTA() {
     // 1. Débloquer l'AudioContext
     unlockAudioContext();
 
-    // 2. Scroller vers la première section décennie
+    // 2. Initialiser Three.js (lazy — premier déclenchement)
+    initThreeJS();
+
+    // 3. Scroller vers la première section décennie
     const firstDecade = document.querySelector('.section-decade');
     if (firstDecade && scrollEngine.lenis) {
       scrollEngine.lenis.scrollTo(firstDecade, {
@@ -108,7 +162,7 @@ function setupCTA() {
       });
     }
 
-    // 3. Marquer que l'intro a été passée (pour le futur AudioManager)
+    // 4. Marquer que l'intro a été passée
     window.__introCompleted = true;
   });
 }
@@ -137,21 +191,39 @@ function init() {
 
     scrollEngine.createDecadeTrigger(section, {
       onEnter: () => {
-        // Marquer la section active
         section.classList.add('is-active');
-        // Événement custom pour les autres systèmes (audio, 3D, etc.)
+
+        // Initialiser Three.js si ce n'est pas encore fait (scroll direct sans CTA)
+        initThreeJS();
+
+        // Activer la scène 3D de cette décennie (si le manager est chargé)
+        if (sceneManager) {
+          sceneManager.activateScene(decadeId);
+        }
+
         window.dispatchEvent(
           new CustomEvent('decade:enter', { detail: { id: decadeId } })
         );
       },
       onLeave: () => {
         section.classList.remove('is-active');
+
+        // Désactiver la scène 3D de cette décennie
+        if (sceneManager) {
+          sceneManager.deactivateScene(decadeId);
+        }
+
         window.dispatchEvent(
           new CustomEvent('decade:leave', { detail: { id: decadeId } })
         );
       },
       onProgress: (progress) => {
-        // Émettre la progression pour les animations futures
+        // Transmettre la progression à la scène 3D pour les animations
+        const sceneInstance = sceneManager?.scenes.get(decadeId);
+        if (sceneInstance?.onScroll) {
+          sceneInstance.onScroll(progress);
+        }
+
         window.dispatchEvent(
           new CustomEvent('decade:progress', {
             detail: { id: decadeId, progress },
