@@ -78,7 +78,7 @@ export const DECADES = [
     title: 'La musique numérique',
     subtitle: "L'iPod",
     model: '/models/ipod-2000.glb',
-    fallbackImage: '/images/fallback/fallback-2000.webp',
+    fallbackImage: '/images/fallback/fallback-2000.svg',
     audio: '/audio/ambiance-2000.mp3',
     colors: {
       background: '#f5f5f5',
@@ -87,7 +87,7 @@ export const DECADES = [
     },
     personalStory: '',
     historicalText: '',
-    sceneModule: null, // Ajouté dans STORY-003
+    sceneModule: () => import('../scenes/Scene2000.js'),
   },
   {
     id: '2010',
@@ -95,7 +95,7 @@ export const DECADES = [
     title: 'Le mobile change tout',
     subtitle: "L'iPhone",
     model: '/models/iphone-2010.glb',
-    fallbackImage: '/images/fallback/fallback-2010.webp',
+    fallbackImage: '/images/fallback/fallback-2010.svg',
     audio: '/audio/ambiance-2010.mp3',
     colors: {
       background: '#1c1c1e',
@@ -104,7 +104,7 @@ export const DECADES = [
     },
     personalStory: '',
     historicalText: '',
-    sceneModule: null, // Ajouté dans STORY-003
+    sceneModule: () => import('../scenes/Scene2010.js'),
   },
   {
     id: '2020',
@@ -112,7 +112,7 @@ export const DECADES = [
     title: "L'intelligence artificielle",
     subtitle: 'Le cerveau IA',
     model: '/models/cerveau-2020.glb',
-    fallbackImage: '/images/fallback/fallback-2020.webp',
+    fallbackImage: '/images/fallback/fallback-2020.svg',
     audio: '/audio/ambiance-2020.mp3',
     colors: {
       background: '#0a0a1a',
@@ -121,6 +121,6 @@ export const DECADES = [
     },
     personalStory: '',
     historicalText: '',
-    sceneModule: null, // Ajouté dans STORY-003
+    sceneModule: () => import('../scenes/Scene2020.js'),
   },
 ];

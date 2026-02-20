@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <!-- Fallback 2D pour l'iPod Classic (GPU tier 0) -->
+  <defs>
+    <radialGradient id="bg-glow-00" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e8e8e8" />
+    </radialGradient>
+    <linearGradient id="chrome" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d0d0d0" />
+      <stop offset="50%" stop-color="#e8e8e8" />
+      <stop offset="100%" stop-color="#b0b0b0" />
+    </linearGradient>
+  </defs>
+  <!-- Fond clair -->
+  <rect width="400" height="300" fill="url(#bg-glow-00)" />
+  <!-- Corps iPod -->
+  <rect x="155" y="30" width="90" height="200" rx="10" fill="#f0f0f0" stroke="#c0c0c0" stroke-width="2" />
+  <!-- Dos chromé (visible sur le bord) -->
+  <rect x="157" y="32" width="86" height="196" rx="9" fill="url(#chrome)" opacity="0.3" />
+  <!-- Écran LCD -->
+  <rect x="170" y="50" width="60" height="50" rx="3" fill="#2a3a2a" />
+  <text x="200" y="72" text-anchor="middle" fill="#88aa88" font-family="sans-serif" font-size="8">Now Playing</text>
+  <text x="200" y="86" text-anchor="middle" fill="#88aa88" font-family="sans-serif" font-size="7" opacity="0.7">♪ Revolution</text>
+  <!-- Click Wheel -->
+  <circle cx="200" cy="165" r="38" fill="#e8e8e8" stroke="#9e9e9e" stroke-width="1.5" />
+  <circle cx="200" cy="165" r="15" fill="#d0d0d0" stroke="#b0b0b0" stroke-width="1" />
+  <!-- Marqueurs MENU/PLAY -->
+  <text x="200" y="138" text-anchor="middle" fill="#888" font-family="sans-serif" font-size="6">MENU</text>
+  <text x="200" y="198" text-anchor="middle" fill="#888" font-family="sans-serif" font-size="8">▶❚❚</text>
+  <!-- Label -->
+  <text x="200" y="260" text-anchor="middle" fill="#212121" font-family="sans-serif" font-size="14" opacity="0.6">iPod Classic · 2001</text>
+</svg>
