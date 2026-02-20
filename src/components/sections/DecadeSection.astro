@@ -1,9 +1,8 @@
 ---
 /**
  * DecadeSection — Composant réutilisable pour chaque décennie.
- * Affiche le titre, sous-titre, et une image fallback pour GPU tier 0.
+ * Affiche le titre, sous-titre, texte historique et une image fallback pour GPU tier 0.
  * La scène 3D est rendue dans le canvas global (couche 1), pas ici.
- * Les textes historiques seront ajoutés dans STORY-009.
  */
 
 interface Props {
@@ -14,10 +13,11 @@ interface Props {
   bgColor: string;
   accentColor: string;
   textColor: string;
+  historicalText?: string;
   fallbackImage?: string;
 }
 
-const { id, label, title, subtitle, bgColor, accentColor, textColor, fallbackImage } = Astro.props;
+const { id, label, title, subtitle, bgColor, accentColor, textColor, historicalText, fallbackImage } = Astro.props;
 ---
 
 <section
@@ -31,6 +31,13 @@ const { id, label, title, subtitle, bgColor, accentColor, textColor, fallbackIma
     <span class="section-decade__label">{label}</span>
     <h2 class="section-decade__title">{title}</h2>
     <p class="section-decade__subtitle">{subtitle}</p>
+
+    {/* Texte historique — révélé progressivement au scroll (GSAP) */}
+    {historicalText && (
+      <p class="section-decade__history" data-decade-text>
+        {historicalText}
+      </p>
+    )}
 
     {/* Image fallback pour GPU tier 0 (masquée par défaut, visible si no-webgl) */}
     {fallbackImage && (
@@ -81,6 +88,16 @@ const { id, label, title, subtitle, bgColor, accentColor, textColor, fallbackIma
   .section-decade__subtitle {
     font-size: clamp(1rem, 2.5vw, 1.25rem);
     opacity: 0.7;
+  }
+
+  /* Texte historique — apparaît progressivement au scroll */
+  .section-decade__history {
+    font-size: clamp(0.95rem, 2.2vw, 1.125rem);
+    line-height: 1.8;
+    max-width: 34rem;
+    margin-top: 1rem;
+    opacity: 0;
+    transform: translateY(1.5rem);
   }
 
   /* Image fallback — masquée par défaut, visible quand body a .no-webgl */

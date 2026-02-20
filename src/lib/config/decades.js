@@ -18,7 +18,7 @@ export const DECADES = [
       text: '#eaeaea',
     },
     personalStory: '',
-    historicalText: '',
+    historicalText: 'En 1968, Douglas Engelbart présente ce qui deviendra la « mère de toutes les démos ». Devant un millier de spectateurs médusés, il dévoile un petit boîtier en bois monté sur deux roues : la souris. Ce geste simple — pointer, cliquer — va redéfinir notre rapport aux machines pour toujours.',
     sceneModule: () => import('../scenes/Scene1960.js'),
   },
   {
@@ -35,7 +35,7 @@ export const DECADES = [
       text: '#c8e6c9',
     },
     personalStory: '',
-    historicalText: '',
+    historicalText: 'Un écran noir. Un curseur vert qui clignote. Dans les années 70, les terminaux VT100 ouvrent les portes d\'Unix à une génération de pionniers. On tape des commandes, on parle à la machine en texte brut. Le code source du futur s\'écrit ligne par ligne, dans le silence des salles serveurs.',
     sceneModule: () => import('../scenes/Scene1970.js'),
   },
   {
@@ -52,7 +52,7 @@ export const DECADES = [
       text: '#f0e6ff',
     },
     personalStory: '',
-    historicalText: '',
+    historicalText: 'L\'informatique quitte les labos pour entrer dans les chambres. Le Macintosh démocratise l\'interface graphique, le Game Boy met un ordinateur dans chaque poche. Pour la première fois, les enfants jouent avec des pixels. La révolution personnelle est en marche — et elle ne s\'arrêtera plus.',
     sceneModule: () => import('../scenes/Scene1980.js'),
   },
   {
@@ -69,7 +69,7 @@ export const DECADES = [
       text: '#e0f7fa',
     },
     personalStory: '',
-    historicalText: '',
+    historicalText: 'Le modem 56k chante sa mélodie de connexion. Tim Berners-Lee invente le World Wide Web au CERN, et soudain, le monde entier tient dans un navigateur. Les premières pages HTML clignotent en Comic Sans. L\'humanité apprend à se connecter — maladroitement, mais passionnément.',
     sceneModule: () => import('../scenes/Scene1990.js'),
   },
   {
@@ -86,7 +86,7 @@ export const DECADES = [
       text: '#212121',
     },
     personalStory: '',
-    historicalText: '',
+    historicalText: '« 1 000 chansons dans votre poche. » En 2001, Steve Jobs sort l\'iPod et bouleverse l\'industrie musicale. Napster a ouvert la voie, iTunes la referme avec élégance. La molette cliquable devient un geste culturel. Le design minimaliste d\'Apple dicte les codes esthétiques d\'une décennie entière.',
     sceneModule: () => import('../scenes/Scene2000.js'),
   },
   {
@@ -103,7 +103,7 @@ export const DECADES = [
       text: '#f2f2f7',
     },
     personalStory: '',
-    historicalText: '',
+    historicalText: 'Le smartphone devient une extension de nous-mêmes. Instagram transforme chaque repas en œuvre d\'art, Uber réinvente le taxi, Tinder réinvente la rencontre. On swipe, on like, on partage. En dix ans, le mobile absorbe la photo, la musique, la banque, le GPS — et notre attention.',
     sceneModule: () => import('../scenes/Scene2010.js'),
   },
   {
@@ -120,7 +120,7 @@ export const DECADES = [
       text: '#e8eaf6',
     },
     personalStory: '',
-    historicalText: '',
+    historicalText: 'ChatGPT explose en 2022 et l\'IA entre dans le quotidien. Les machines écrivent, dessinent, composent, codent. La frontière entre humain et artificiel se brouille. On ne demande plus « est-ce qu\'un ordinateur peut penser ? » mais « qu\'est-ce que penser veut encore dire ? »',
     sceneModule: () => import('../scenes/Scene2020.js'),
   },
 ];
