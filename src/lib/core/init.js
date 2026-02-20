@@ -78,6 +78,29 @@ function animateIntro() {
 }
 
 /**
+ * Animations des textes historiques — révélation progressive au scroll (progressive disclosure).
+ * Chaque texte apparaît en fade-in + slide-up quand sa section entre dans le viewport.
+ */
+function animateDecadeTexts() {
+  const textElements = document.querySelectorAll('[data-decade-text]');
+  if (!textElements.length) return;
+
+  textElements.forEach((el) => {
+    gsap.to(el, {
+      scrollTrigger: {
+        trigger: el.closest('.section-decade'),
+        start: 'top 60%',
+        end: 'top 20%',
+        scrub: 0.8,
+      },
+      opacity: 1,
+      y: 0,
+      ease: 'none',
+    });
+  });
+}
+
+/**
  * Animations de la ContactSection — révélation au scroll.
  */
 function animateContact() {
@@ -190,6 +213,9 @@ function init() {
 
   // Setup du CTA "Commencer le voyage"
   setupCTA();
+
+  // Animations des textes historiques (progressive disclosure au scroll)
+  animateDecadeTexts();
 
   // Animations du contact (révélation au scroll)
   animateContact();
