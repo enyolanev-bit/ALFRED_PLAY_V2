@@ -55,6 +55,9 @@ export default class Scene1970 {
   async init() {
     if (this._initialized) return;
 
+    // Couleur de fond de la scène — visible à travers les sections HTML transparentes
+    this.scene.background = new THREE.Color(this.config.colors.background);
+
     this._createLighting();
     this._createTerminal();
     this._setInitialState();
@@ -73,15 +76,16 @@ export default class Scene1970 {
     const entranceProgress = Math.min(progress / 0.3, 1);
     const eased = 1 - Math.pow(1 - entranceProgress, 3);
 
-    const scale = eased * 1;
+    // Scale immersif (×2.0 — terminal de taille moyenne)
+    const scale = eased * 2.0;
     this.terminalGroup.scale.setScalar(scale);
     this.terminalGroup.visible = entranceProgress > 0.01;
 
     // Rotation douce + interaction utilisateur
     this.terminalGroup.rotation.y = -0.3 + progress * Math.PI * 0.6 + this._interactionRotation;
 
-    // Oscillation verticale
-    this.terminalGroup.position.y = Math.sin(progress * Math.PI) * 0.15;
+    // Centrage vertical (compense le centre local à y≈0.94) + oscillation douce
+    this.terminalGroup.position.y = -0.94 * scale + Math.sin(progress * Math.PI) * 0.2;
   }
 
   /**

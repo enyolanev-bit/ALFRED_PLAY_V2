@@ -56,6 +56,9 @@ export default class Scene1960 {
   async init() {
     if (this._initialized) return;
 
+    // Couleur de fond de la scène — visible à travers les sections HTML transparentes
+    this.scene.background = new THREE.Color(this.config.colors.background);
+
     this._createLighting();
     this._createMouse();
     this._setInitialState();
@@ -78,16 +81,16 @@ export default class Scene1960 {
     const entranceProgress = Math.min(progress / 0.3, 1);
     const eased = 1 - Math.pow(1 - entranceProgress, 3); // ease-out cubic
 
-    // Apparition progressive : scale + opacité
-    const scale = eased * 1;
+    // Apparition progressive : scale immersif (×3.5 — objet petit, doit remplir le viewport)
+    const scale = eased * 3.5;
     this.mouseGroup.scale.setScalar(scale);
     this.mouseGroup.visible = entranceProgress > 0.01;
 
     // Rotation douce selon la progression globale + interaction utilisateur
     this.mouseGroup.rotation.y = -0.3 + progress * Math.PI * 0.6 + this._interactionRotation;
 
-    // Légère oscillation verticale pour donner de la vie
-    this.mouseGroup.position.y = Math.sin(progress * Math.PI) * 0.15;
+    // Centrage vertical (compense le centre local à y≈0.3) + oscillation douce
+    this.mouseGroup.position.y = -0.3 * scale + Math.sin(progress * Math.PI) * 0.2;
   }
 
   /**

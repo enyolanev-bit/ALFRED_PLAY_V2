@@ -59,6 +59,9 @@ export default class Scene2000 {
   async init() {
     if (this._initialized) return;
 
+    // Couleur de fond de la scène — visible à travers les sections HTML transparentes
+    this.scene.background = new THREE.Color(this.config.colors.background);
+
     this._createLighting();
     this._createIPod();
     this._setInitialState();
@@ -77,15 +80,16 @@ export default class Scene2000 {
     const entranceProgress = Math.min(progress / 0.3, 1);
     const eased = 1 - Math.pow(1 - entranceProgress, 3);
 
-    const scale = eased * 1;
+    // Scale immersif (×2.2 — iPod fin, doit remplir la hauteur)
+    const scale = eased * 2.2;
     this.ipodGroup.scale.setScalar(scale);
     this.ipodGroup.visible = entranceProgress > 0.01;
 
     // Rotation douce + interaction utilisateur
     this.ipodGroup.rotation.y = -0.3 + progress * Math.PI * 0.6 + this._interactionRotation;
 
-    // Oscillation verticale
-    this.ipodGroup.position.y = Math.sin(progress * Math.PI) * 0.15;
+    // iPod déjà centré (y≈0) — oscillation douce seulement
+    this.ipodGroup.position.y = Math.sin(progress * Math.PI) * 0.2;
   }
 
   /**

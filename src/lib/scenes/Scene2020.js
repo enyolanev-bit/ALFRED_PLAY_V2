@@ -60,6 +60,9 @@ export default class Scene2020 {
   async init() {
     if (this._initialized) return;
 
+    // Couleur de fond de la scène — visible à travers les sections HTML transparentes
+    this.scene.background = new THREE.Color(this.config.colors.background);
+
     this._createLighting();
     this._createBrain();
     this._setInitialState();
@@ -78,7 +81,8 @@ export default class Scene2020 {
     const entranceProgress = Math.min(progress / 0.3, 1);
     const eased = 1 - Math.pow(1 - entranceProgress, 3);
 
-    const scale = eased * 1;
+    // Scale immersif (×3.0 — cerveau petit, les anneaux orbitaux ajoutent du volume)
+    const scale = eased * 3.0;
     this.brainGroup.scale.setScalar(scale);
     this.brainGroup.visible = entranceProgress > 0.01;
 
@@ -91,8 +95,8 @@ export default class Scene2020 {
       this._ringsGroup.rotation.z = progress * Math.PI * 0.5;
     }
 
-    // Oscillation verticale
-    this.brainGroup.position.y = Math.sin(progress * Math.PI) * 0.15;
+    // Centrage vertical (centre local quasi centré à y≈-0.08) + oscillation douce
+    this.brainGroup.position.y = 0.08 * scale + Math.sin(progress * Math.PI) * 0.2;
   }
 
   /**

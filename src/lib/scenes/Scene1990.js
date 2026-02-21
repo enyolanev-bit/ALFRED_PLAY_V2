@@ -59,6 +59,9 @@ export default class Scene1990 {
   async init() {
     if (this._initialized) return;
 
+    // Couleur de fond de la scène — visible à travers les sections HTML transparentes
+    this.scene.background = new THREE.Color(this.config.colors.background);
+
     this._createLighting();
     this._createWorld();
     this._setInitialState();
@@ -77,7 +80,8 @@ export default class Scene1990 {
     const entranceProgress = Math.min(progress / 0.3, 1);
     const eased = 1 - Math.pow(1 - entranceProgress, 3);
 
-    const scale = eased * 1;
+    // Scale immersif (×1.8 — globe + modem ensemble)
+    const scale = eased * 1.8;
     this.worldGroup.scale.setScalar(scale);
     this.worldGroup.visible = entranceProgress > 0.01;
 
@@ -89,8 +93,8 @@ export default class Scene1990 {
       this._globeMesh.rotation.y = progress * Math.PI * 1.5;
     }
 
-    // Oscillation verticale
-    this.worldGroup.position.y = Math.sin(progress * Math.PI) * 0.15;
+    // Centrage vertical (compense le centre local à y≈0.43) + oscillation douce
+    this.worldGroup.position.y = -0.43 * scale + Math.sin(progress * Math.PI) * 0.2;
   }
 
   /**

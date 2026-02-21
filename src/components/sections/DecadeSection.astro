@@ -64,7 +64,9 @@ const { id, label, title, subtitle, bgColor, accentColor, textColor, historicalT
 
 <style>
   .section-decade {
-    background-color: var(--decade-bg);
+    /* Fond transparent — la 3D (canvas z-index: 0) est visible en arrière-plan.
+       La couleur d'ambiance est gérée par scene.background dans chaque scène Three.js. */
+    background-color: transparent;
     color: var(--decade-text);
   }
 
@@ -75,6 +77,12 @@ const { id, label, title, subtitle, bgColor, accentColor, textColor, historicalT
     text-align: center;
     gap: 0.75rem;
     max-width: 40rem;
+    /* Fond semi-transparent teinté de la couleur de la décennie — lisibilité par-dessus la 3D */
+    padding: 2rem 1.5rem;
+    border-radius: 1rem;
+    background: color-mix(in srgb, var(--decade-bg) 65%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   .section-decade__label {
@@ -84,6 +92,7 @@ const { id, label, title, subtitle, bgColor, accentColor, textColor, historicalT
     opacity: 0.1;
     line-height: 1;
     letter-spacing: -0.05em;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
   }
 
   .section-decade__title {
@@ -92,11 +101,13 @@ const { id, label, title, subtitle, bgColor, accentColor, textColor, historicalT
     font-weight: 700;
     line-height: 1.2;
     color: var(--decade-accent);
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
   }
 
   .section-decade__subtitle {
     font-size: clamp(1rem, 2.5vw, 1.25rem);
     opacity: 0.7;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
   }
 
   /* Texte historique — apparaît progressivement au scroll */
@@ -107,6 +118,7 @@ const { id, label, title, subtitle, bgColor, accentColor, textColor, historicalT
     margin-top: 1rem;
     opacity: 0;
     transform: translateY(1.5rem);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
   }
 
   /* Histoire personnelle — visuellement distinct du texte historique */
@@ -122,6 +134,8 @@ const { id, label, title, subtitle, bgColor, accentColor, textColor, historicalT
     text-align: left;
     opacity: 0;
     transform: translateY(1.5rem);
+    background: color-mix(in srgb, var(--decade-bg) 50%, transparent);
+    border-radius: 0 0.5rem 0.5rem 0;
   }
 
   .section-decade__personal p {

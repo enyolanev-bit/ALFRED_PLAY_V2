@@ -58,6 +58,9 @@ export default class Scene1980 {
   async init() {
     if (this._initialized) return;
 
+    // Couleur de fond de la scène — visible à travers les sections HTML transparentes
+    this.scene.background = new THREE.Color(this.config.colors.background);
+
     this._createLighting();
     this._createGameBoy();
     this._setInitialState();
@@ -76,15 +79,16 @@ export default class Scene1980 {
     const entranceProgress = Math.min(progress / 0.3, 1);
     const eased = 1 - Math.pow(1 - entranceProgress, 3);
 
-    const scale = eased * 1;
+    // Scale immersif (×1.8 — Game Boy déjà grand, 2 unités de haut)
+    const scale = eased * 1.8;
     this.gameboyGroup.scale.setScalar(scale);
     this.gameboyGroup.visible = entranceProgress > 0.01;
 
     // Rotation douce + interaction utilisateur
     this.gameboyGroup.rotation.y = -0.3 + progress * Math.PI * 0.6 + this._interactionRotation;
 
-    // Oscillation verticale
-    this.gameboyGroup.position.y = Math.sin(progress * Math.PI) * 0.15;
+    // Centrage vertical (centre local quasi centré à y≈-0.1) + oscillation douce
+    this.gameboyGroup.position.y = 0.1 * scale + Math.sin(progress * Math.PI) * 0.2;
   }
 
   /**

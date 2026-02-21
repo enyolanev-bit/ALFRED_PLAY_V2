@@ -17,7 +17,19 @@
       "Bash(npx astro:*)",
       "Bash(node -e:*)",
       "Bash(gh repo create:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(git stash pop:*)",
+      "Bash(ls:*)",
+      "Bash(gh pr:*)",
+      "Bash(git stash:*)",
+      "Bash(git pull:*)",
+      "Bash(git diff:*)",
+      "Bash(npm run dev:*)",
+      "WebFetch(domain:localhost)",
+      "Bash(curl:*)",
+      "Bash(start:*)",
+      "Bash(grep:*)",
+      "Bash(head:*)"
     ]
   }
 }
