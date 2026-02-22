@@ -91,12 +91,14 @@
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid var(--color-border);
     border-radius: 50%;
-    color: #eaeaea;
+    color: var(--color-text-primary);
 
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.2s ease, opacity 0.3s ease;
+    transition: background var(--duration-fast) var(--ease-in-out),
+                transform var(--duration-fast) var(--ease-in-out),
+                opacity var(--duration-base) var(--ease-out-quart);
   }
 
   .audio-toggle:hover {
@@ -105,7 +107,7 @@
   }
 
   .audio-toggle:focus-visible {
-    outline: 2px solid #e94560;
+    outline: 2px solid var(--color-accent);
     outline-offset: 3px;
   }
 

@@ -1,8 +1,8 @@
 ---
 /**
  * DecadeSection — Composant réutilisable pour chaque décennie.
- * Affiche le titre, sous-titre, texte historique et une image fallback pour GPU tier 0.
- * La scène 3D est rendue dans le canvas global (couche 1), pas ici.
+ * Layout asymétrique : texte d'un côté, espace 3D de l'autre (canvas fixe visible).
+ * Alternance gauche/droite gérée par CSS nth-child.
  */
 
 interface Props {
@@ -10,15 +10,12 @@ interface Props {
   label: string;
   title: string;
   subtitle: string;
-  bgColor: string;
-  accentColor: string;
-  textColor: string;
   historicalText?: string;
   personalStory?: string;
   fallbackImage?: string;
 }
 
-const { id, label, title, subtitle, bgColor, accentColor, textColor, historicalText, personalStory, fallbackImage } = Astro.props;
+const { id, label, title, subtitle, historicalText, personalStory, fallbackImage } = Astro.props;
 ---
 
 <section
@@ -26,29 +23,31 @@ const { id, label, title, subtitle, bgColor, accentColor, textColor, historicalT
   id={`decade-${id}`}
   data-decade={id}
   aria-label={`Décennie ${label}`}
-  style={`--decade-bg: ${bgColor}; --decade-accent: ${accentColor}; --decade-text: ${textColor};`}
 >
-  <div class="section-decade__inner">
-    <span class="section-decade__label">{label}</span>
+  {/* Chiffre de décennie — très grand, très transparent, en arrière-plan */}
+  <span class="section-decade__number" aria-hidden="true">{label}</span>
+
+  {/* Colonne texte — gauche par défaut, droite sur les sections paires */}
+  <div class="section-decade__text">
     <h2 class="section-decade__title">{title}</h2>
     <p class="section-decade__subtitle">{subtitle}</p>
 
-    {/* Texte historique — révélé progressivement au scroll (GSAP) */}
     {historicalText && (
       <p class="section-decade__history" data-decade-text>
         {historicalText}
       </p>
     )}
 
-    {/* Histoire personnelle de Nevil — visuellement distinct, ton personnel */}
     {personalStory && (
       <blockquote class="section-decade__personal" data-decade-personal>
         <span class="section-decade__personal-tag">Mon histoire</span>
         <p>{personalStory}</p>
       </blockquote>
     )}
+  </div>
 
-    {/* Image fallback pour GPU tier 0 (masquée par défaut, visible si no-webgl) */}
+  {/* Colonne 3D — espace vide pour que le canvas fixe soit visible */}
+  <div class="section-decade__visual" aria-hidden="true">
     {fallbackImage && (
       <img
         class="section-decade__fallback"
@@ -63,95 +62,106 @@ const { id, label, title, subtitle, bgColor, accentColor, textColor, historicalT
 </section>
 
 <style>
+  /* Fond transparent — la 3D (canvas z-index: 0) est visible en arrière-plan */
   .section-decade {
-    /* Fond transparent — la 3D (canvas z-index: 0) est visible en arrière-plan.
-       La couleur d'ambiance est gérée par scene.background dans chaque scène Three.js. */
     background-color: transparent;
-    color: var(--decade-text);
+    color: var(--color-text-primary);
   }
 
-  .section-decade__inner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 0.75rem;
-    max-width: 40rem;
-    /* Fond semi-transparent teinté de la couleur de la décennie — lisibilité par-dessus la 3D */
-    padding: 2rem 1.5rem;
-    border-radius: 1rem;
-    background: color-mix(in srgb, var(--decade-bg) 65%, transparent);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-
-  .section-decade__label {
+  /* Chiffre de décennie — très grand, très discret, en arrière-plan */
+  .section-decade__number {
     font-family: var(--font-display);
-    font-size: clamp(4rem, 15vw, 10rem);
+    font-size: var(--text-decade);
     font-weight: 700;
-    opacity: 0.1;
+    color: var(--color-text-muted);
+    opacity: 0.3;
+    position: absolute;
+    top: 50%;
+    right: max(5vw, 2rem);
+    transform: translateY(-50%);
+    user-select: none;
+    pointer-events: none;
+    z-index: 0;
     line-height: 1;
-    letter-spacing: -0.05em;
-    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Sections paires : chiffre à gauche */
+  .section-decade:nth-child(even) .section-decade__number {
+    right: auto;
+    left: max(5vw, 2rem);
+  }
+
+  /* Colonne texte */
+  .section-decade__text {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
   }
 
   .section-decade__title {
     font-family: var(--font-display);
-    font-size: clamp(1.75rem, 5vw, 3rem);
+    font-size: var(--text-h1);
     font-weight: 700;
-    line-height: 1.2;
-    color: var(--decade-accent);
-    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--color-accent);
   }
 
   .section-decade__subtitle {
-    font-size: clamp(1rem, 2.5vw, 1.25rem);
-    opacity: 0.7;
-    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+    font-family: var(--font-body);
+    font-size: var(--text-h3);
+    color: var(--color-text-secondary);
+    margin-top: var(--space-sm);
+    line-height: 1.5;
   }
 
-  /* Texte historique — apparaît progressivement au scroll */
+  /* Texte historique — apparaît progressivement au scroll (GSAP) */
   .section-decade__history {
-    font-size: clamp(0.95rem, 2.2vw, 1.125rem);
-    line-height: 1.8;
-    max-width: 34rem;
-    margin-top: 1rem;
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    color: var(--color-text-primary);
+    line-height: 1.7;
+    max-width: 38ch;
+    margin-top: var(--space-md);
     opacity: 0;
     transform: translateY(1.5rem);
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
   }
 
-  /* Histoire personnelle — visuellement distinct du texte historique */
+  /* Histoire personnelle — bloc avec bordure accent */
   .section-decade__personal {
-    position: relative;
-    font-size: clamp(0.9rem, 2vw, 1.05rem);
-    font-style: italic;
-    line-height: 1.75;
-    max-width: 30rem;
-    margin-top: 1.25rem;
-    padding: 1rem 1.25rem;
-    border-left: 3px solid var(--decade-accent);
-    text-align: left;
+    border-left: 3px solid var(--color-accent);
+    padding-left: var(--space-md);
+    margin-top: var(--space-md);
     opacity: 0;
     transform: translateY(1.5rem);
-    background: color-mix(in srgb, var(--decade-bg) 50%, transparent);
-    border-radius: 0 0.5rem 0.5rem 0;
-  }
-
-  .section-decade__personal p {
-    margin: 0;
-    opacity: 0.85;
   }
 
   .section-decade__personal-tag {
-    display: inline-block;
-    font-size: 0.7rem;
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--text-small);
     font-style: normal;
     font-weight: 600;
+    color: var(--color-accent);
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--decade-accent);
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-xs);
+  }
+
+  .section-decade__personal p {
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    color: var(--color-text-secondary);
+    font-style: italic;
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* Colonne visuelle — espace pour le canvas 3D */
+  .section-decade__visual {
+    position: relative;
+    z-index: 1;
+    min-height: 300px;
   }
 
   /* Image fallback — masquée par défaut, visible quand body a .no-webgl */
@@ -159,8 +169,7 @@ const { id, label, title, subtitle, bgColor, accentColor, textColor, historicalT
     display: none;
     max-width: 100%;
     height: auto;
-    margin-top: 1.5rem;
-    border-radius: 0.5rem;
+    border-radius: 12px;
     opacity: 0.85;
   }
 

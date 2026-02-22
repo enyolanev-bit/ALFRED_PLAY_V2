@@ -9,19 +9,58 @@
 }
 
 :root {
-  /* Couleurs globales */
-  --color-bg: #0a0a0a;
-  --color-text: #eaeaea;
-  --color-accent: #e94560;
+  /* === FOND === */
+  --color-bg:            #0A0A0A;
+  --color-bg-elevated:   #141414;
+  --color-bg-subtle:     #1A1A1A;
 
-  /* Typographie */
-  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-display: 'Space Grotesk', var(--font-body);
+  /* === TEXTE === */
+  --color-text-primary:  #F5F5F7;
+  --color-text-secondary:#86868B;
+  --color-text-muted:    #48484A;
 
-  /* Espacement */
-  --section-padding: 1.5rem;
+  /* === ACCENT === */
+  --color-accent:        #E63946;
+  --color-accent-hover:  #FF4D5A;
+  --color-accent-muted:  rgba(230, 57, 70, 0.15);
 
-  /* Z-index layers */
+  /* === UTILITAIRES === */
+  --color-border:        rgba(255, 255, 255, 0.08);
+  --color-overlay:       rgba(0, 0, 0, 0.6);
+
+  /* === TYPOGRAPHIE — Fonts === */
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body:    'Plus Jakarta Sans', sans-serif;
+
+  /* === TYPOGRAPHIE — Échelle === */
+  --text-hero:     clamp(4rem, 8vw, 8rem);
+  --text-decade:   clamp(5rem, 12vw, 12rem);
+  --text-h1:       clamp(2rem, 4vw, 3.5rem);
+  --text-h2:       clamp(1.5rem, 3vw, 2rem);
+  --text-h3:       clamp(1.125rem, 2vw, 1.5rem);
+  --text-body:     clamp(1rem, 1.5vw, 1.125rem);
+  --text-small:    clamp(0.8rem, 1.2vw, 0.875rem);
+  --text-tiny:     0.75rem;
+
+  /* === ESPACEMENT === */
+  --space-xs:   0.5rem;
+  --space-sm:   1rem;
+  --space-md:   2rem;
+  --space-lg:   4rem;
+  --space-xl:   8rem;
+  --space-2xl:  12rem;
+  --space-section: clamp(8rem, 15vh, 16rem);
+
+  /* === ANIMATIONS === */
+  --ease-out-expo:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out:    cubic-bezier(0.76, 0, 0.24, 1);
+  --duration-fast:  200ms;
+  --duration-base:  400ms;
+  --duration-slow:  800ms;
+  --duration-enter: 1200ms;
+
+  /* === Z-INDEX === */
   --z-canvas: 0;
   --z-content: 1;
   --z-overlay: 2;
@@ -35,9 +74,10 @@ html {
 
 body {
   font-family: var(--font-body);
-  color: var(--color-text);
+  font-size: var(--text-body);
+  color: var(--color-text-primary);
   background-color: var(--color-bg);
-  line-height: 1.6;
+  line-height: 1.7;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -62,32 +102,35 @@ main {
   z-index: var(--z-content);
 }
 
-/* === Section décennie === */
+/* === Section décennie — Layout asymétrique en grille === */
 
 .section-decade {
   position: relative;
   width: 100%;
   min-height: 100vh;
-  min-height: 100dvh; /* Hauteur dynamique pour mobile */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
   align-items: center;
-  padding: var(--section-padding);
+  padding: var(--space-xl) max(5vw, 2rem);
 }
 
-.section-decade__title {
-  font-family: var(--font-display);
-  font-size: clamp(2.5rem, 8vw, 6rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+/* Espacement généreux entre les sections de décennie */
+.section-decade + .section-decade {
+  margin-top: var(--space-section);
 }
 
-.section-decade__subtitle {
-  font-size: clamp(1rem, 3vw, 1.5rem);
-  opacity: 0.7;
-  margin-top: 0.5rem;
+/* Alternance gauche/droite pour le rythme visuel */
+.section-decade:nth-child(even) .section-decade__text   { order: 2; }
+.section-decade:nth-child(even) .section-decade__visual { order: 1; }
+
+/* Mobile — 1 colonne, texte à gauche */
+@media (max-width: 768px) {
+  .section-decade {
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
 }
 
 /* === Overlay UI (couche 3) === */
@@ -120,18 +163,32 @@ main {
   border: 0;
 }
 
-/* === Responsive — Tablet (768px+) === */
+/* === Liens et éléments interactifs === */
 
-@media (min-width: 768px) {
-  :root {
-    --section-padding: 3rem;
-  }
+a, button, .interactive {
+  transition: color var(--duration-fast) var(--ease-in-out),
+              transform var(--duration-fast) var(--ease-in-out);
 }
 
-/* === Responsive — Desktop (1024px+) === */
-
-@media (min-width: 1024px) {
-  :root {
-    --section-padding: 4rem;
-  }
+a:hover {
+  color: var(--color-accent);
 }
+
+/* === Animations de révélation au scroll === */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity var(--duration-slow) var(--ease-out-expo),
+              transform var(--duration-slow) var(--ease-out-expo);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal:nth-child(1) { transition-delay: 0ms; }
+.reveal:nth-child(2) { transition-delay: 100ms; }
+.reveal:nth-child(3) { transition-delay: 200ms; }
+.reveal:nth-child(4) { transition-delay: 300ms; }

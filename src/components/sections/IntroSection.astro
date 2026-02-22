@@ -3,6 +3,7 @@
  * IntroSection — Écran d'accueil immersif avec effet "wow".
  * Premier contact visuel du visiteur : animations GSAP, fond animé, CTA impactant.
  * Le clic sur le CTA débloque l'AudioContext et scrolle vers la première décennie.
+ * Seule section autorisée à être centrée (design system).
  */
 ---
 
@@ -44,7 +45,7 @@
 </section>
 
 <style>
-  /* === IntroSection — Écran d'accueil === */
+  /* === IntroSection — Écran d'accueil (seule section centrée) === */
 
   .intro-section {
     position: relative;
@@ -55,10 +56,10 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 1.5rem;
+    padding: var(--space-xl) max(5vw, 2rem);
     text-align: center;
     overflow: hidden;
-    background: #0a0a0a;
+    background: var(--color-bg);
   }
 
   /* --- Fond animé --- */
@@ -75,14 +76,14 @@
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(233, 69, 96, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(233, 69, 96, 0.03) 1px, transparent 1px);
+      linear-gradient(rgba(230, 57, 70, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(230, 57, 70, 0.03) 1px, transparent 1px);
     background-size: 60px 60px;
     mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 70%);
     -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 70%);
   }
 
-  /* Halo lumineux central — accent chaud */
+  /* Halo lumineux central — très subtil */
   .intro-section__glow {
     position: absolute;
     top: 50%;
@@ -90,13 +91,13 @@
     width: 600px;
     height: 600px;
     transform: translate(-50%, -50%);
-    background: radial-gradient(circle, rgba(233, 69, 96, 0.12) 0%, transparent 70%);
-    animation: glow-pulse 4s ease-in-out infinite;
+    background: radial-gradient(circle, rgba(230, 57, 70, 0.08) 0%, transparent 70%);
+    animation: glow-pulse 4s var(--ease-in-out) infinite;
   }
 
   @keyframes glow-pulse {
     0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
-    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
   }
 
   /* --- Contenu principal --- */
@@ -106,7 +107,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.25rem;
+    gap: var(--space-sm);
     z-index: 1;
   }
 
@@ -118,8 +119,8 @@
 
   /* Eyebrow — timeline hint */
   .intro-section__eyebrow {
-    font-family: var(--font-body);
-    font-size: 0.875rem;
+    font-family: var(--font-display);
+    font-size: var(--text-small);
     font-weight: 500;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -127,10 +128,10 @@
     opacity: 0;
   }
 
-  /* Titre principal */
+  /* Titre principal — hero */
   .intro-section__title {
     font-family: var(--font-display);
-    font-size: clamp(2.5rem, 10vw, 6rem);
+    font-size: var(--text-hero);
     font-weight: 700;
     line-height: 1.05;
     letter-spacing: -0.03em;
@@ -138,18 +139,18 @@
 
   .intro-section__title-line {
     display: block;
-    color: var(--color-text);
+    color: var(--color-text-primary);
   }
 
   .intro-section__title-line--accent {
     color: var(--color-accent);
-    text-shadow: 0 0 40px rgba(233, 69, 96, 0.3);
   }
 
   /* Sous-titre */
   .intro-section__subtitle {
-    font-size: clamp(1rem, 3vw, 1.25rem);
-    color: rgba(234, 234, 234, 0.6);
+    font-family: var(--font-body);
+    font-size: var(--text-h3);
+    color: var(--color-text-secondary);
     max-width: 28ch;
     line-height: 1.5;
   }
@@ -158,68 +159,69 @@
 
   .intro-section__cta {
     position: relative;
-    margin-top: 1.5rem;
+    margin-top: var(--space-md);
     padding: 1.1rem 2.5rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    font-family: var(--font-body);
-    font-size: 1.125rem;
+    font-family: var(--font-display);
+    font-size: var(--text-body);
     font-weight: 600;
-    color: #fff;
+    color: var(--color-text-primary);
     background: var(--color-accent);
     border: none;
     border-radius: 9999px;
     cursor: pointer;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-    box-shadow: 0 4px 25px rgba(233, 69, 96, 0.3);
+    transition: transform var(--duration-fast) var(--ease-out-quart),
+                box-shadow var(--duration-fast) var(--ease-out-quart);
+    box-shadow: 0 4px 25px rgba(230, 57, 70, 0.3);
   }
 
   .intro-section__cta:hover {
-    transform: scale(1.06);
-    box-shadow: 0 6px 40px rgba(233, 69, 96, 0.5);
+    transform: scale(1.04);
+    box-shadow: 0 6px 40px rgba(230, 57, 70, 0.4);
   }
 
   .intro-section__cta:active {
-    transform: scale(0.97);
+    transform: scale(0.98);
   }
 
   .intro-section__cta-icon {
     display: inline-block;
-    transition: transform 0.3s ease;
+    transition: transform var(--duration-fast) var(--ease-out-quart);
   }
 
   .intro-section__cta:hover .intro-section__cta-icon {
     transform: translateX(4px);
   }
 
-  /* Anneau pulsant autour du CTA */
+  /* Anneau pulsant autour du CTA — animation d'entrée de page */
   .intro-section__cta::before {
     content: '';
     position: absolute;
     inset: -4px;
     border-radius: 9999px;
-    border: 2px solid rgba(233, 69, 96, 0.4);
-    animation: cta-ring 2.5s ease-in-out infinite;
+    border: 2px solid rgba(230, 57, 70, 0.3);
+    animation: cta-ring 2.5s var(--ease-in-out) infinite;
     pointer-events: none;
   }
 
   @keyframes cta-ring {
     0%, 100% { opacity: 0; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.08); }
+    50% { opacity: 1; transform: scale(1.06); }
   }
 
   /* --- Indicateur de scroll --- */
 
   .intro-section__scroll-hint {
     position: absolute;
-    bottom: 2rem;
+    bottom: var(--space-md);
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-xs);
     opacity: 0; /* Révélé par GSAP après le CTA */
   }
 
@@ -227,7 +229,7 @@
     width: 1px;
     height: 40px;
     background: linear-gradient(180deg, var(--color-accent), transparent);
-    animation: scroll-line 2s ease-in-out infinite;
+    animation: scroll-line 2s var(--ease-in-out) infinite;
   }
 
   @keyframes scroll-line {
@@ -238,11 +240,12 @@
   }
 
   .intro-section__scroll-label {
-    font-size: 0.6875rem;
+    font-family: var(--font-display);
+    font-size: var(--text-tiny);
     font-weight: 500;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: rgba(234, 234, 234, 0.4);
+    color: var(--color-text-muted);
   }
 
   /* --- Responsive tablet (768px+) --- */
@@ -255,7 +258,6 @@
 
     .intro-section__cta {
       padding: 1.25rem 3rem;
-      font-size: 1.25rem;
     }
   }
 </style>
