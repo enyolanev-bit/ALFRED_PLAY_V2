@@ -4,7 +4,7 @@
  * Modèle procédural low-poly de la première souris informatique (1968).
  * Boîtier en bois rectangulaire, un bouton rouge, un câble, deux roulettes.
  * Style : low-poly stylisé, matériaux PBR simples.
- * Palette : tons sombres, accent chaleureux (#e94560).
+ * Palette : tons sombres, accent chaleureux.
  *
  * Remplaçable par un .glb Blender via le pipeline SceneLoader.
  */
@@ -15,7 +15,7 @@ import * as THREE from 'three';
 const PALETTE = {
   wood: 0x8b6914,       // Bois chêne foncé
   woodDark: 0x5c4a0e,   // Bois ombre
-  button: 0xe94560,      // Accent rouge (couleur du site)
+  button: 0xE63946,      // Accent rouge (couleur du site)
   cable: 0x2a2a2a,       // Câble noir
   wheel: 0x3d3d3d,       // Roulettes métal sombre
   ambient: 0xfff0e0,     // Lumière ambiante chaude
@@ -56,8 +56,7 @@ export default class Scene1960 {
   async init() {
     if (this._initialized) return;
 
-    // Couleur de fond de la scène — visible à travers les sections HTML transparentes
-    this.scene.background = new THREE.Color(this.config.colors.background);
+    // Pas de scene.background — canvas transparent (alpha: true), CSS #0A0A0A visible derrière
 
     this._createLighting();
     this._createMouse();

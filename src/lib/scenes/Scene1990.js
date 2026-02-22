@@ -59,8 +59,7 @@ export default class Scene1990 {
   async init() {
     if (this._initialized) return;
 
-    // Couleur de fond de la scène — visible à travers les sections HTML transparentes
-    this.scene.background = new THREE.Color(this.config.colors.background);
+    // Canvas transparent — CSS background visible derrière
 
     this._createLighting();
     this._createWorld();

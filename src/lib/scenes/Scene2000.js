@@ -7,8 +7,6 @@
  * Style : low-poly stylisé, matériaux PBR simples.
  * Palette : blanc/chrome, ambiance musique numérique.
  *
- * NOTE : Cette décennie a un fond clair (#f5f5f5) — éclairage adapté.
- *
  * Remplaçable par un .glb Blender via le pipeline SceneLoader.
  */
 
@@ -59,8 +57,7 @@ export default class Scene2000 {
   async init() {
     if (this._initialized) return;
 
-    // Couleur de fond de la scène — visible à travers les sections HTML transparentes
-    this.scene.background = new THREE.Color(this.config.colors.background);
+    // Canvas transparent — CSS background visible derrière
 
     this._createLighting();
     this._createIPod();
