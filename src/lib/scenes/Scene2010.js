@@ -125,6 +125,25 @@ export default class Scene2010 {
     this._interactionRotation = rotationY;
   }
 
+  /**
+   * Remplace les primitives par un modèle GLTF importé.
+   * Préserve le groupe principal (phoneGroup) pour que onScroll/onCursorMove fonctionnent.
+   * Note : _screenLight est dans la scène (pas le groupe), il reste actif.
+   * @param {THREE.Object3D} gltfScene — Scène GLTF chargée
+   */
+  setModel(gltfScene) {
+    if (!this.phoneGroup) return;
+
+    while (this.phoneGroup.children.length > 0) {
+      this.phoneGroup.remove(this.phoneGroup.children[0]);
+    }
+
+    this.phoneGroup.add(gltfScene);
+
+    // Nullifier les références aux meshes primitifs
+    this._screenMesh = null;
+  }
+
   dispose() {
     this.phoneGroup = null;
     this._screenMesh = null;

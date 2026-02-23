@@ -129,6 +129,25 @@ export default class Scene1970 {
     this._interactionRotation = rotationY;
   }
 
+  /**
+   * Remplace les primitives par un modèle GLTF importé.
+   * Préserve le groupe principal (terminalGroup) pour que onScroll/onCursorMove fonctionnent.
+   * @param {THREE.Object3D} gltfScene — Scène GLTF chargée
+   */
+  setModel(gltfScene) {
+    if (!this.terminalGroup) return;
+
+    while (this.terminalGroup.children.length > 0) {
+      this.terminalGroup.remove(this.terminalGroup.children[0]);
+    }
+
+    this.terminalGroup.add(gltfScene);
+
+    // Nullifier les références aux meshes primitifs
+    this._screenMesh = null;
+    this._blinkCursor = null;
+  }
+
   dispose() {
     this.terminalGroup = null;
     this._screenMesh = null;

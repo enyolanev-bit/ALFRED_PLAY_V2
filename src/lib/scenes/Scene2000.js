@@ -125,6 +125,25 @@ export default class Scene2000 {
     this._interactionRotation = rotationY;
   }
 
+  /**
+   * Remplace les primitives par un modèle GLTF importé.
+   * Préserve le groupe principal (ipodGroup) pour que onScroll/onCursorMove fonctionnent.
+   * @param {THREE.Object3D} gltfScene — Scène GLTF chargée
+   */
+  setModel(gltfScene) {
+    if (!this.ipodGroup) return;
+
+    while (this.ipodGroup.children.length > 0) {
+      this.ipodGroup.remove(this.ipodGroup.children[0]);
+    }
+
+    this.ipodGroup.add(gltfScene);
+
+    // Nullifier les références aux meshes primitifs
+    this._wheelSurface = null;
+    this._wheelOuter = null;
+  }
+
   dispose() {
     this.ipodGroup = null;
     this._wheelSurface = null;

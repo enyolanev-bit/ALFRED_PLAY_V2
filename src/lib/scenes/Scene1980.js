@@ -118,6 +118,21 @@ export default class Scene1980 {
     this._interactionRotation = rotationY;
   }
 
+  /**
+   * Remplace les primitives par un modèle GLTF importé.
+   * Préserve le groupe principal (gameboyGroup) pour que onScroll/onCursorMove fonctionnent.
+   * @param {THREE.Object3D} gltfScene — Scène GLTF chargée
+   */
+  setModel(gltfScene) {
+    if (!this.gameboyGroup) return;
+
+    while (this.gameboyGroup.children.length > 0) {
+      this.gameboyGroup.remove(this.gameboyGroup.children[0]);
+    }
+
+    this.gameboyGroup.add(gltfScene);
+  }
+
   dispose() {
     this.gameboyGroup = null;
     this._initialized = false;

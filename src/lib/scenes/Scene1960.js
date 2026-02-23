@@ -121,6 +121,23 @@ export default class Scene1960 {
     this._interactionRotation = rotationY;
   }
 
+  /**
+   * Remplace les primitives par un modèle GLTF importé.
+   * Préserve le groupe principal (mouseGroup) pour que onScroll/onCursorMove fonctionnent.
+   * @param {THREE.Object3D} gltfScene — Scène GLTF chargée
+   */
+  setModel(gltfScene) {
+    if (!this.mouseGroup) return;
+
+    // Supprimer les primitives du groupe
+    while (this.mouseGroup.children.length > 0) {
+      this.mouseGroup.remove(this.mouseGroup.children[0]);
+    }
+
+    // Ajouter le modèle GLTF
+    this.mouseGroup.add(gltfScene);
+  }
+
   dispose() {
     this.mouseGroup = null;
     this._initialized = false;

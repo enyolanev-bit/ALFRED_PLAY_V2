@@ -150,6 +150,27 @@ export default class Scene2020 {
     this._interactionRotation = rotationY;
   }
 
+  /**
+   * Remplace les primitives par un modèle GLTF importé.
+   * Préserve le groupe principal (brainGroup) pour que onScroll/onCursorMove fonctionnent.
+   * @param {THREE.Object3D} gltfScene — Scène GLTF chargée
+   */
+  setModel(gltfScene) {
+    if (!this.brainGroup) return;
+
+    while (this.brainGroup.children.length > 0) {
+      this.brainGroup.remove(this.brainGroup.children[0]);
+    }
+
+    this.brainGroup.add(gltfScene);
+
+    // Nullifier les références aux meshes primitifs
+    this._ringsGroup = null;
+    this._nodes = [];
+    this._particles = [];
+    this._particleBasePositions = [];
+  }
+
   dispose() {
     this.brainGroup = null;
     this._ringsGroup = null;

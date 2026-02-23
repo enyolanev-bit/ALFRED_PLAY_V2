@@ -51,7 +51,7 @@ class SceneLoader {
 
     // DRACOLoader — décode les .glb compressés via Web Worker
     this.dracoLoader = new DRACOLoader();
-    this.dracoLoader.setDecoderPath('/draco/');
+    this.dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
     this.dracoLoader.setDecoderConfig({ type: 'wasm' });
 
     // GLTFLoader — utilise Draco pour les modèles compressés
@@ -194,6 +194,28 @@ class SceneLoader {
     this.initialized = false;
   }
 
+  /**
+   * Tente de charger un modèle .glb pour une décennie.
+   * Retourne la scène GLTF si le fichier existe, null sinon (fallback primitives).
+   *
+   * @param {string} decadeId — ID de la décennie (ex: '1960')
+   * @returns {Promise<import('three').Object3D | null>}
+   */
+  async loadModel(decadeId) {
+    const decadeConfig = DECADES.find((d) => d.id === decadeId);
+    if (!decadeConfig?.model || !this.gltfLoader) return null;
+
+    try {
+      const gltf = await this.gltfLoader.loadAsync(decadeConfig.model);
+      console.log(`[SceneLoader] Modèle GLTF chargé : ${decadeConfig.model}`);
+      return gltf.scene;
+    } catch (err) {
+      // 404 ou erreur réseau — fallback sur les primitives procédurales
+      console.log(`[SceneLoader] Pas de modèle GLTF pour ${decadeId} — fallback primitives`);
+      return null;
+    }
+  }
+
   // --- Méthodes privées ---
 
   /**
@@ -243,6 +265,12 @@ class SceneLoader {
     // Initialiser la scène (chargement du modèle, setup lumières, etc.)
     if (typeof sceneInstance.init === 'function') {
       await sceneInstance.init();
+    }
+
+    // Tenter de charger le modèle .glb (fallback sur les primitives si 404)
+    const gltfScene = await this.loadModel(decadeId);
+    if (gltfScene && typeof sceneInstance.setModel === 'function') {
+      sceneInstance.setModel(gltfScene);
     }
 
     return sceneInstance;

@@ -122,6 +122,24 @@ export default class Scene1990 {
     this._interactionRotation = rotationY;
   }
 
+  /**
+   * Remplace les primitives par un modèle GLTF importé.
+   * Préserve le groupe principal (worldGroup) pour que onScroll/onCursorMove fonctionnent.
+   * @param {THREE.Object3D} gltfScene — Scène GLTF chargée
+   */
+  setModel(gltfScene) {
+    if (!this.worldGroup) return;
+
+    while (this.worldGroup.children.length > 0) {
+      this.worldGroup.remove(this.worldGroup.children[0]);
+    }
+
+    this.worldGroup.add(gltfScene);
+
+    // Nullifier les références aux meshes primitifs
+    this._globeMesh = null;
+  }
+
   dispose() {
     this.worldGroup = null;
     this._globeMesh = null;
