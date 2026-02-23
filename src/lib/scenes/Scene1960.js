@@ -87,7 +87,7 @@ export default class Scene1960 {
     const eased = 1 - Math.pow(1 - entranceProgress, 3); // ease-out cubic
 
     // Apparition progressive : scale immersif (×3.5 — objet petit, doit remplir le viewport)
-    const scale = eased * 2.1;
+    const scale = eased * 2.8;
     this.mouseGroup.scale.setScalar(scale);
     this.mouseGroup.visible = entranceProgress > 0.01;
 

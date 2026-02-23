@@ -86,7 +86,7 @@ export default class Scene2000 {
     const eased = 1 - Math.pow(1 - entranceProgress, 3);
 
     // Scale immersif (×2.2 — iPod fin, doit remplir la hauteur)
-    const scale = eased * 1.32;
+    const scale = eased * 1.7;
     this.ipodGroup.scale.setScalar(scale);
     this.ipodGroup.visible = entranceProgress > 0.01;
 

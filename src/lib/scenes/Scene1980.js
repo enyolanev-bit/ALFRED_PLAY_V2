@@ -85,7 +85,7 @@ export default class Scene1980 {
     const eased = 1 - Math.pow(1 - entranceProgress, 3);
 
     // Scale immersif (×1.8 — Game Boy déjà grand, 2 unités de haut)
-    const scale = eased * 1.08;
+    const scale = eased * 1.5;
     this.gameboyGroup.scale.setScalar(scale);
     this.gameboyGroup.visible = entranceProgress > 0.01;
 
