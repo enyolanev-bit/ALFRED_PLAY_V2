@@ -212,10 +212,32 @@ export default class Scene1980 {
       metalness: 0.0,
     });
 
-    // --- Corps principal ---
+    // --- Texture face avant (Photopea) ---
+    const textureLoader = new THREE.TextureLoader();
+    const frontTexture = textureLoader.load('/textures/gameboy-front.png');
+    frontTexture.colorSpace = THREE.SRGBColorSpace;
+    frontTexture.flipY = true;
+
+    const frontMat = new THREE.MeshStandardMaterial({
+      map: frontTexture,
+      roughness: 0.5,
+      metalness: 0.05,
+    });
+
+    // --- Corps principal (6 matériaux : texture sur la face avant) ---
+    // BoxGeometry faces : +X, -X, +Y, -Y, +Z (front/caméra), -Z (arrière)
+    const bodyMaterials = [
+      bodyMat,  // +X droite
+      bodyMat,  // -X gauche
+      bodyMat,  // +Y haut
+      bodyMat,  // -Y bas
+      frontMat, // +Z face avant (texture Photopea)
+      bodyMat,  // -Z arrière
+    ];
+
     const body = new THREE.Mesh(
       new THREE.BoxGeometry(1.0, 1.7, 0.35, 1, 1, 1),
-      bodyMat
+      bodyMaterials
     );
     body.position.set(0, 0, 0);
     this.gameboyGroup.add(body);
