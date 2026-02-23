@@ -51,6 +51,12 @@ export default class Scene1980 {
     /** @type {number} Rotation ajoutée par l'interaction utilisateur (drag) */
     this._interactionRotation = 0;
 
+    // --- Curseur : tilt 3D (comme si on tient la console) ---
+    /** @type {number} Tilt X cible (inclinaison haut/bas) */
+    this._tiltX = 0;
+    /** @type {number} Tilt Y cible (inclinaison gauche/droite) */
+    this._tiltY = 0;
+
     /** @type {boolean} */
     this._initialized = false;
   }
@@ -79,15 +85,29 @@ export default class Scene1980 {
     const eased = 1 - Math.pow(1 - entranceProgress, 3);
 
     // Scale immersif (×1.8 — Game Boy déjà grand, 2 unités de haut)
-    const scale = eased * 1.8;
+    const scale = eased * 1.08;
     this.gameboyGroup.scale.setScalar(scale);
     this.gameboyGroup.visible = entranceProgress > 0.01;
 
     // Rotation douce + interaction utilisateur
-    this.gameboyGroup.rotation.y = -0.3 + progress * Math.PI * 0.6 + this._interactionRotation;
+    this.gameboyGroup.rotation.y = -0.3 + progress * Math.PI * 0.6 + this._interactionRotation + this._tiltY;
+
+    // Tilt 3D : inclinaison qui suit le curseur (comme si on tient la console)
+    this.gameboyGroup.rotation.x = -0.1 + this._tiltX;
 
     // Centrage vertical (centre local quasi centré à y≈-0.1) + oscillation douce
     this.gameboyGroup.position.y = 0.1 * scale + Math.sin(progress * Math.PI) * 0.2;
+  }
+
+  /**
+   * Micro-interaction curseur : tilt 3D.
+   * La console s'incline comme si on la tenait et qu'on tourne le poignet.
+   * @param {number} mx — Curseur X normalisé (-1 à +1)
+   * @param {number} my — Curseur Y normalisé (-1 à +1)
+   */
+  onCursorMove(mx, my) {
+    this._tiltY = mx * 0.4;
+    this._tiltX = my * -0.3;
   }
 
   /**

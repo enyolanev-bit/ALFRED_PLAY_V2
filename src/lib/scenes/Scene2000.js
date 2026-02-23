@@ -50,6 +50,14 @@ export default class Scene2000 {
     /** @type {number} Rotation ajoutée par l'interaction utilisateur (drag) */
     this._interactionRotation = 0;
 
+    // --- Curseur : molette qui tourne ---
+    /** @type {THREE.Mesh|null} Mesh de la surface de la molette */
+    this._wheelSurface = null;
+    /** @type {THREE.Mesh|null} Mesh de l'anneau extérieur */
+    this._wheelOuter = null;
+    /** @type {number} Angle de rotation cumulé de la molette */
+    this._wheelAngle = 0;
+
     /** @type {boolean} */
     this._initialized = false;
   }
@@ -78,7 +86,7 @@ export default class Scene2000 {
     const eased = 1 - Math.pow(1 - entranceProgress, 3);
 
     // Scale immersif (×2.2 — iPod fin, doit remplir la hauteur)
-    const scale = eased * 2.2;
+    const scale = eased * 1.32;
     this.ipodGroup.scale.setScalar(scale);
     this.ipodGroup.visible = entranceProgress > 0.01;
 
@@ -87,6 +95,26 @@ export default class Scene2000 {
 
     // iPod déjà centré (y≈0) — oscillation douce seulement
     this.ipodGroup.position.y = Math.sin(progress * Math.PI) * 0.2;
+  }
+
+  /**
+   * Micro-interaction curseur : la molette tourne.
+   * La direction du curseur fait tourner la click wheel dans la direction correspondante.
+   * @param {number} mx — Curseur X normalisé (-1 à +1)
+   * @param {number} my — Curseur Y normalisé (-1 à +1)
+   */
+  onCursorMove(mx, my) {
+    // Angle du curseur par rapport au centre → rotation de la molette
+    const angle = Math.atan2(my, mx);
+    this._wheelAngle += (angle - this._wheelAngle) * 0.3;
+
+    // Appliquer la rotation Z locale (la molette est déjà orientée face caméra)
+    if (this._wheelSurface) {
+      this._wheelSurface.rotation.z = this._wheelAngle;
+    }
+    if (this._wheelOuter) {
+      this._wheelOuter.rotation.z = this._wheelAngle;
+    }
   }
 
   /**
@@ -99,6 +127,8 @@ export default class Scene2000 {
 
   dispose() {
     this.ipodGroup = null;
+    this._wheelSurface = null;
+    this._wheelOuter = null;
     this._initialized = false;
   }
 
@@ -242,6 +272,7 @@ export default class Scene2000 {
     wheelOuter.position.set(0, -0.25, 0.08);
     wheelOuter.rotation.x = Math.PI / 2;
     this.ipodGroup.add(wheelOuter);
+    this._wheelOuter = wheelOuter;
 
     // Surface de la molette
     const wheelSurface = new THREE.Mesh(
@@ -251,6 +282,7 @@ export default class Scene2000 {
     wheelSurface.position.set(0, -0.25, 0.08);
     wheelSurface.rotation.x = Math.PI / 2;
     this.ipodGroup.add(wheelSurface);
+    this._wheelSurface = wheelSurface;
 
     // Bouton central
     const centerBtn = new THREE.Mesh(

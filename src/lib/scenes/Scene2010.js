@@ -50,6 +50,12 @@ export default class Scene2010 {
     /** @type {number} Rotation ajoutée par l'interaction utilisateur (drag) */
     this._interactionRotation = 0;
 
+    // --- Curseur : écran qui s'allume ---
+    /** @type {THREE.Mesh|null} Mesh de l'écran */
+    this._screenMesh = null;
+    /** @type {THREE.PointLight|null} Reflet écran (intensité dynamique) */
+    this._screenLight = null;
+
     /** @type {boolean} */
     this._initialized = false;
   }
@@ -78,7 +84,7 @@ export default class Scene2010 {
     const eased = 1 - Math.pow(1 - entranceProgress, 3);
 
     // Scale immersif (×2.0 — smartphone, taille moyenne)
-    const scale = eased * 2.0;
+    const scale = eased * 1.2;
     this.phoneGroup.scale.setScalar(scale);
     this.phoneGroup.visible = entranceProgress > 0.01;
 
@@ -87,6 +93,28 @@ export default class Scene2010 {
 
     // iPhone déjà centré (y≈0) — oscillation douce seulement
     this.phoneGroup.position.y = Math.sin(progress * Math.PI) * 0.2;
+  }
+
+  /**
+   * Micro-interaction curseur : l'écran s'allume plus fort au hover.
+   * Plus le curseur est proche du centre, plus l'écran brille.
+   * @param {number} mx — Curseur X normalisé (-1 à +1)
+   * @param {number} my — Curseur Y normalisé (-1 à +1)
+   */
+  onCursorMove(mx, my) {
+    // Proximité au centre : 1 au centre, 0 aux coins
+    const dist = Math.sqrt(mx * mx + my * my);
+    const proximity = Math.max(0, 1 - dist);
+
+    // Écran : emissiveIntensity de 0.25 (base) à 0.6 (hover central)
+    if (this._screenMesh) {
+      this._screenMesh.material.emissiveIntensity = 0.25 + proximity * 0.95;
+    }
+
+    // Reflet bleu : intensité de 0.3 (base) à 0.7 (hover central)
+    if (this._screenLight) {
+      this._screenLight.intensity = 0.3 + proximity * 1.2;
+    }
   }
 
   /**
@@ -99,6 +127,8 @@ export default class Scene2010 {
 
   dispose() {
     this.phoneGroup = null;
+    this._screenMesh = null;
+    this._screenLight = null;
     this._initialized = false;
   }
 
@@ -116,10 +146,11 @@ export default class Scene2010 {
     fill.position.set(-2, 1, -3);
     this.scene.add(fill);
 
-    // Reflet bleu sur l'écran
+    // Reflet bleu sur l'écran (intensité dynamique via curseur)
     const screenReflect = new THREE.PointLight(PALETTE.screenGlow, 0.3, 3);
     screenReflect.position.set(0, 0.2, 0.5);
     this.scene.add(screenReflect);
+    this._screenLight = screenReflect;
   }
 
   /**
@@ -217,6 +248,7 @@ export default class Scene2010 {
     );
     screen.position.set(0, 0.05, 0.051);
     this.phoneGroup.add(screen);
+    this._screenMesh = screen;
 
     // Bezel haut (zone caméra/speaker)
     const bezelTop = new THREE.Mesh(

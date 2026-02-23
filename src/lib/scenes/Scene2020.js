@@ -53,6 +53,18 @@ export default class Scene2020 {
     /** @type {number} Rotation ajoutée par l'interaction utilisateur (drag) */
     this._interactionRotation = 0;
 
+    // --- Curseur : particules/anneaux réactifs ---
+    /** @type {THREE.Mesh[]} Nœuds neuronaux lumineux */
+    this._nodes = [];
+    /** @type {THREE.Mesh[]} Particules d'énergie flottantes */
+    this._particles = [];
+    /** @type {number[][]} Positions initiales des particules */
+    this._particleBasePositions = [];
+    /** @type {number} Curseur X lissé */
+    this._cursorX = 0;
+    /** @type {number} Curseur Y lissé */
+    this._cursorY = 0;
+
     /** @type {boolean} */
     this._initialized = false;
   }
@@ -81,7 +93,7 @@ export default class Scene2020 {
     const eased = 1 - Math.pow(1 - entranceProgress, 3);
 
     // Scale immersif (×3.0 — cerveau petit, les anneaux orbitaux ajoutent du volume)
-    const scale = eased * 3.0;
+    const scale = eased * 1.8;
     this.brainGroup.scale.setScalar(scale);
     this.brainGroup.visible = entranceProgress > 0.01;
 
@@ -99,6 +111,38 @@ export default class Scene2020 {
   }
 
   /**
+   * Micro-interaction curseur : cerveau réactif.
+   * Les anneaux dévient, les particules sont attirées, les nodes pulsent.
+   * @param {number} mx — Curseur X normalisé (-1 à +1)
+   * @param {number} my — Curseur Y normalisé (-1 à +1)
+   */
+  onCursorMove(mx, my) {
+    this._cursorX = mx;
+    this._cursorY = my;
+
+    // Anneaux orbitaux : offset de rotation selon le curseur
+    if (this._ringsGroup) {
+      this._ringsGroup.rotation.x += my * 0.01;
+      this._ringsGroup.rotation.z += mx * 0.01;
+    }
+
+    // Particules flottantes : attirées vers la position du curseur
+    for (let i = 0; i < this._particles.length; i++) {
+      const p = this._particles[i];
+      const base = this._particleBasePositions[i];
+      p.position.x = base[0] + mx * 0.5;
+      p.position.y = base[1] + my * 0.5;
+    }
+
+    // Nœuds neuronaux : emissiveIntensity pulse selon la distance au curseur
+    const cursorDist = Math.sqrt(mx * mx + my * my);
+    for (const node of this._nodes) {
+      // Chaque nœud pulse entre 0.8 (base) et 1.5 (réactif)
+      node.material.emissiveIntensity = 0.8 + cursorDist * 0.5;
+    }
+  }
+
+  /**
    * Applique la rotation d'interaction utilisateur (drag horizontal).
    * @param {number} rotationY — Rotation en radians
    */
@@ -109,6 +153,9 @@ export default class Scene2020 {
   dispose() {
     this.brainGroup = null;
     this._ringsGroup = null;
+    this._nodes = [];
+    this._particles = [];
+    this._particleBasePositions = [];
     this._initialized = false;
   }
 
@@ -241,9 +288,10 @@ export default class Scene2020 {
     ];
 
     for (const pos of nodePositions) {
-      const node = new THREE.Mesh(nodeGeom, nodeMat);
+      const node = new THREE.Mesh(nodeGeom, nodeMat.clone());
       node.position.set(pos[0], pos[1], pos[2]);
       this.brainGroup.add(node);
+      this._nodes.push(node);
     }
 
     // --- Connexions synaptiques (lignes entre nœuds) ---
@@ -338,6 +386,8 @@ export default class Scene2020 {
       const particle = new THREE.Mesh(particleGeom, particleMat);
       particle.position.set(pos[0], pos[1], pos[2]);
       this.brainGroup.add(particle);
+      this._particles.push(particle);
+      this._particleBasePositions.push([pos[0], pos[1], pos[2]]);
     }
 
     // --- Positionnement final ---

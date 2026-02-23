@@ -46,6 +46,12 @@ export default class Scene1960 {
     /** @type {number} Rotation ajoutée par l'interaction utilisateur (drag) */
     this._interactionRotation = 0;
 
+    // --- Curseur : parallax 3D ---
+    /** @type {number} Position curseur X lissée (-1 à +1) */
+    this._cursorX = 0;
+    /** @type {number} Position curseur Y lissée (-1 à +1) */
+    this._cursorY = 0;
+
     /** @type {boolean} La scène a-t-elle été initialisée ? */
     this._initialized = false;
   }
@@ -81,7 +87,7 @@ export default class Scene1960 {
     const eased = 1 - Math.pow(1 - entranceProgress, 3); // ease-out cubic
 
     // Apparition progressive : scale immersif (×3.5 — objet petit, doit remplir le viewport)
-    const scale = eased * 3.5;
+    const scale = eased * 2.1;
     this.mouseGroup.scale.setScalar(scale);
     this.mouseGroup.visible = entranceProgress > 0.01;
 
@@ -90,12 +96,23 @@ export default class Scene1960 {
 
     // Centrage vertical (compense le centre local à y≈0.3) + oscillation douce
     this.mouseGroup.position.y = -0.3 * scale + Math.sin(progress * Math.PI) * 0.2;
+
+    // Parallax 3D : l'objet flotte doucement vers le curseur
+    this.mouseGroup.position.x = this._cursorX * 0.9;
+    this.mouseGroup.position.z = this._cursorY * 0.5;
   }
 
   /**
-   * Libère les ressources spécifiques à cette scène.
-   * Le dispose des géométries/matériaux est géré par dispose.js via SceneLoader.
+   * Micro-interaction curseur : parallax 3D.
+   * L'objet suit légèrement la position du curseur — comme s'il flottait.
+   * @param {number} mx — Curseur X normalisé (-1 à +1)
+   * @param {number} my — Curseur Y normalisé (-1 à +1)
    */
+  onCursorMove(mx, my) {
+    this._cursorX = mx;
+    this._cursorY = my;
+  }
+
   /**
    * Applique la rotation d'interaction utilisateur (drag horizontal).
    * @param {number} rotationY — Rotation en radians

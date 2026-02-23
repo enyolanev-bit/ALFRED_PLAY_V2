@@ -52,6 +52,12 @@ export default class Scene1990 {
     /** @type {number} Rotation ajoutée par l'interaction utilisateur (drag) */
     this._interactionRotation = 0;
 
+    // --- Curseur : rotation dynamique du globe ---
+    /** @type {number} Activité du curseur (distance au centre, 0-~1.4) */
+    this._cursorActivity = 0;
+    /** @type {number} Vitesse de rotation bonus liée au curseur */
+    this._cursorRotationBoost = 0;
+
     /** @type {boolean} */
     this._initialized = false;
   }
@@ -80,20 +86,32 @@ export default class Scene1990 {
     const eased = 1 - Math.pow(1 - entranceProgress, 3);
 
     // Scale immersif (×1.8 — globe + modem ensemble)
-    const scale = eased * 1.8;
+    const scale = eased * 1.08;
     this.worldGroup.scale.setScalar(scale);
     this.worldGroup.visible = entranceProgress > 0.01;
 
     // Le groupe tourne doucement + interaction utilisateur
     this.worldGroup.rotation.y = -0.3 + progress * Math.PI * 0.6 + this._interactionRotation;
 
-    // Le globe interne tourne un peu plus vite (effet de rotation terrestre)
+    // Le globe interne tourne : vitesse de base + boost curseur
     if (this._globeMesh) {
-      this._globeMesh.rotation.y = progress * Math.PI * 1.5;
+      this._cursorRotationBoost += this._cursorActivity * 0.06;
+      this._globeMesh.rotation.y = progress * Math.PI * 1.5 + this._cursorRotationBoost;
     }
 
     // Centrage vertical (compense le centre local à y≈0.43) + oscillation douce
     this.worldGroup.position.y = -0.43 * scale + Math.sin(progress * Math.PI) * 0.2;
+  }
+
+  /**
+   * Micro-interaction curseur : rotation dynamique.
+   * Le globe accélère quand la souris bouge, ralentit quand elle s'arrête.
+   * @param {number} mx — Curseur X normalisé (-1 à +1)
+   * @param {number} my — Curseur Y normalisé (-1 à +1)
+   */
+  onCursorMove(mx, my) {
+    // Distance au centre = proxy de mouvement (grâce au lerp de SceneManager)
+    this._cursorActivity = Math.sqrt(mx * mx + my * my);
   }
 
   /**

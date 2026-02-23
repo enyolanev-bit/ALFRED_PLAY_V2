@@ -12,6 +12,9 @@
 import * as THREE from 'three';
 import { getQualityConfig } from '../utils/gpu-detect.js';
 
+/** Facteur de lerp pour le lissage curseur (0-1, plus bas = plus smooth) */
+const CURSOR_LERP = 0.12;
+
 class SceneManager {
   constructor() {
     /** @type {THREE.WebGLRenderer | null} */
@@ -38,9 +41,17 @@ class SceneManager {
     /** @type {boolean} La boucle RAF tourne-t-elle ? */
     this._running = false;
 
+    // --- Curseur normalisé (-1 à +1) avec interpolation douce ---
+    /** @type {{ x: number, y: number }} Position lissée (lerp) */
+    this.mouse = { x: 0, y: 0 };
+    /** @type {{ x: number, y: number }} Position cible brute */
+    this._mouseTarget = { x: 0, y: 0 };
+
     // Bind pour conserver le contexte
     this._onResize = this._onResize.bind(this);
     this._renderLoop = this._renderLoop.bind(this);
+    this._onMouseMove = this._onMouseMove.bind(this);
+    this._onDeviceOrientation = this._onDeviceOrientation.bind(this);
   }
 
   /**
@@ -94,6 +105,10 @@ class SceneManager {
 
     // Écouter le redimensionnement
     window.addEventListener('resize', this._onResize);
+
+    // Écouter le curseur (desktop) et le gyroscope (mobile)
+    window.addEventListener('mousemove', this._onMouseMove, { passive: true });
+    this._initDeviceOrientation();
 
     this.initialized = true;
     return qualityResult;
@@ -171,6 +186,8 @@ class SceneManager {
   destroy() {
     this._stopRenderLoop();
     window.removeEventListener('resize', this._onResize);
+    window.removeEventListener('mousemove', this._onMouseMove);
+    window.removeEventListener('deviceorientation', this._onDeviceOrientation);
 
     if (this.renderer) {
       this.renderer.dispose();
@@ -178,6 +195,8 @@ class SceneManager {
     }
 
     this.camera = null;
+    this.mouse = { x: 0, y: 0 };
+    this._mouseTarget = { x: 0, y: 0 };
     this.scenes.clear();
     this.activeScenes.clear();
     this.qualityConfig = null;
@@ -188,18 +207,28 @@ class SceneManager {
 
   /**
    * Boucle de rendu unique — rend toutes les scènes actives.
+   * Interpole le curseur (lerp) et transmet aux scènes.
    */
   _renderLoop() {
     this._rafId = requestAnimationFrame(this._renderLoop);
 
     if (!this.renderer || !this.camera) return;
 
-    // Rendre chaque scène active
+    // Interpolation douce du curseur (lerp vers la cible)
+    this.mouse.x += (this._mouseTarget.x - this.mouse.x) * CURSOR_LERP;
+    this.mouse.y += (this._mouseTarget.y - this.mouse.y) * CURSOR_LERP;
+
+    // Rendre chaque scène active + transmettre le curseur
     for (const id of this.activeScenes) {
       const sceneInstance = this.scenes.get(id);
-      if (sceneInstance?.scene) {
-        this.renderer.render(sceneInstance.scene, this.camera);
+      if (!sceneInstance?.scene) continue;
+
+      // Transmettre le curseur lissé à la scène si elle implémente onCursorMove
+      if (sceneInstance.onCursorMove) {
+        sceneInstance.onCursorMove(this.mouse.x, this.mouse.y);
       }
+
+      this.renderer.render(sceneInstance.scene, this.camera);
     }
   }
 
@@ -219,6 +248,57 @@ class SceneManager {
     if (!this._running) return;
     cancelAnimationFrame(this._rafId);
     this._running = false;
+  }
+
+  /**
+   * Normalise la position du curseur en -1 à +1.
+   * Pas de calcul lourd ici — on stocke juste la cible, le lerp tourne dans le RAF.
+   * @param {MouseEvent} e
+   */
+  _onMouseMove(e) {
+    this._mouseTarget.x = (e.clientX / window.innerWidth) * 2 - 1;
+    this._mouseTarget.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  }
+
+  /**
+   * Fallback mobile : utilise le gyroscope comme source de curseur.
+   * beta (inclinaison avant/arrière) → Y, gamma (gauche/droite) → X.
+   * @param {DeviceOrientationEvent} e
+   */
+  _onDeviceOrientation(e) {
+    if (e.gamma === null || e.beta === null) return;
+    // gamma : -90 à +90 → normaliser en -1 à +1 (clamp à ±45° pour confort)
+    this._mouseTarget.x = Math.max(-1, Math.min(1, e.gamma / 45));
+    // beta : 0 à 180 → centré autour de 60° (position naturelle du téléphone)
+    this._mouseTarget.y = Math.max(-1, Math.min(1, -(e.beta - 60) / 45));
+  }
+
+  /**
+   * Tente d'activer le gyroscope sur mobile (nécessite permission sur iOS 13+).
+   */
+  _initDeviceOrientation() {
+    // Vérifier si l'API est disponible et si on est sur mobile/tablette
+    if (!window.DeviceOrientationEvent) return;
+
+    // iOS 13+ requiert une permission explicite
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      // On ne demande pas la permission automatiquement — attendre une interaction
+      const requestOnce = () => {
+        DeviceOrientationEvent.requestPermission()
+          .then((state) => {
+            if (state === 'granted') {
+              window.addEventListener('deviceorientation', this._onDeviceOrientation, { passive: true });
+            }
+          })
+          .catch(() => {});
+        // Retirer le listener après la première tentative
+        window.removeEventListener('touchstart', requestOnce);
+      };
+      window.addEventListener('touchstart', requestOnce, { once: true });
+    } else {
+      // Android / navigateurs sans permission
+      window.addEventListener('deviceorientation', this._onDeviceOrientation, { passive: true });
+    }
   }
 
   /**

@@ -48,6 +48,16 @@ export default class Scene1970 {
     /** @type {number} Rotation ajoutée par l'interaction utilisateur (drag) */
     this._interactionRotation = 0;
 
+    // --- Curseur : écran phosphore réactif ---
+    /** @type {THREE.Mesh|null} Mesh de l'écran phosphore vert */
+    this._screenMesh = null;
+    /** @type {THREE.Mesh|null} Curseur clignotant sur l'écran */
+    this._blinkCursor = null;
+    /** @type {number} Activité curseur (0 = immobile, 1 = mouvement max) */
+    this._cursorActivity = 0;
+    /** @type {number} Phase du clignotement */
+    this._blinkPhase = 0;
+
     /** @type {boolean} */
     this._initialized = false;
   }
@@ -76,7 +86,7 @@ export default class Scene1970 {
     const eased = 1 - Math.pow(1 - entranceProgress, 3);
 
     // Scale immersif (×2.0 — terminal de taille moyenne)
-    const scale = eased * 2.0;
+    const scale = eased * 1.2;
     this.terminalGroup.scale.setScalar(scale);
     this.terminalGroup.visible = entranceProgress > 0.01;
 
@@ -85,6 +95,30 @@ export default class Scene1970 {
 
     // Centrage vertical (compense le centre local à y≈0.94) + oscillation douce
     this.terminalGroup.position.y = -0.94 * scale + Math.sin(progress * Math.PI) * 0.2;
+  }
+
+  /**
+   * Micro-interaction curseur : écran phosphore réactif.
+   * L'écran vert s'illumine au mouvement de souris, le curseur clignote plus vite.
+   * @param {number} mx — Curseur X normalisé (-1 à +1)
+   * @param {number} my — Curseur Y normalisé (-1 à +1)
+   */
+  onCursorMove(mx, my) {
+    // Activité = distance au centre (0 quand immobile au centre, ~1.4 aux coins)
+    this._cursorActivity = Math.sqrt(mx * mx + my * my);
+
+    // Écran phosphore : intensité émissive varie de 0.3 (base) à 0.8 (actif)
+    if (this._screenMesh) {
+      this._screenMesh.material.emissiveIntensity = 0.3 + this._cursorActivity * 0.85;
+    }
+
+    // Curseur clignotant : fréquence accélère avec le mouvement
+    if (this._blinkCursor) {
+      // Vitesse de base 2Hz, monte à 8Hz avec l'activité curseur
+      const speed = 2 + this._cursorActivity * 6;
+      this._blinkPhase += speed * 0.016; // ~60fps
+      this._blinkCursor.material.opacity = Math.sin(this._blinkPhase * Math.PI * 2) > 0 ? 0.9 : 0;
+    }
   }
 
   /**
@@ -97,6 +131,8 @@ export default class Scene1970 {
 
   dispose() {
     this.terminalGroup = null;
+    this._screenMesh = null;
+    this._blinkCursor = null;
     this._initialized = false;
   }
 
@@ -202,6 +238,21 @@ export default class Scene1970 {
     );
     screen.position.set(0, 0.95, 0.66);
     this.terminalGroup.add(screen);
+    this._screenMesh = screen;
+
+    // --- Curseur clignotant sur l'écran ---
+    const blinkMat = new THREE.MeshBasicMaterial({
+      color: PALETTE.screenGlow,
+      transparent: true,
+      opacity: 0.9,
+    });
+    const blinkCursor = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.06, 0.08),
+      blinkMat
+    );
+    blinkCursor.position.set(-0.3, 0.92, 0.67);
+    this.terminalGroup.add(blinkCursor);
+    this._blinkCursor = blinkCursor;
 
     // --- Base du moniteur ---
     const base = new THREE.Mesh(
