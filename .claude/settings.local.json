@@ -29,7 +29,9 @@
       "Bash(curl:*)",
       "Bash(start:*)",
       "Bash(grep:*)",
-      "Bash(head:*)"
+      "Bash(head:*)",
+      "Bash(find /c/Users/citry/OneDrive/Bureau/ALFRED_PLAY_V2/src -type f -exec wc -c {} ;)",
+      "Bash(cd \"C:\\\\Users\\\\citry\\\\OneDrive\\\\Bureau\\\\ALFRED_PLAY_V2\" && npx kill-port 4321 4322 4323 4324 2>&1)"
     ]
   }
 }

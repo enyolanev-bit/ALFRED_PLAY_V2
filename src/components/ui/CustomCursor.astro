@@ -1,0 +1,250 @@
+---
+/**
+ * CustomCursor — Curseur custom dot + ring.
+ *
+ * Dot (6px) : suit la souris exactement (position instantanée).
+ * Ring (40px) : suit avec un léger délai (lerp en requestAnimationFrame).
+ *
+ * États :
+ * - Default : dot blanc + ring outline blanc
+ * - Hover liens/boutons : ring scale 1.5, semi-transparent
+ * - Hover canvas 3D : dot disparaît, ring se transforme en crosshair
+ * - Clic : compression subtile
+ * - Mobile : masqué (hover: none)
+ */
+---
+
+<div class="custom-cursor" id="custom-cursor" aria-hidden="true">
+  <div class="custom-cursor__dot" id="cursor-dot"></div>
+  <div class="custom-cursor__ring" id="cursor-ring"></div>
+</div>
+
+<script>
+  /**
+   * Tracking du curseur custom.
+   * Dot = position instantanée, Ring = position lissée par lerp.
+   */
+  (() => {
+    // Ne pas initialiser sur appareils tactiles
+    if (window.matchMedia('(hover: none)').matches) return;
+
+    const cursor = document.getElementById('custom-cursor');
+    const dot = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
+    if (!cursor || !dot || !ring) return;
+
+    // Activer cursor: none sur tout le document
+    document.body.classList.add('has-custom-cursor');
+
+    // Positions
+    let mouseX = -100;
+    let mouseY = -100;
+    let ringX = -100;
+    let ringY = -100;
+    let visible = false;
+
+    const LERP = 0.15;
+
+    // Sélecteur pour les éléments interactifs
+    const INTERACTIVE = 'a, button, [role="button"], .interactive, input, select, textarea, label[for]';
+
+    // --- Tracking souris ---
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+
+      if (!visible) {
+        visible = true;
+        cursor.classList.remove('is-hidden');
+        // Téléporter le ring à la position initiale (évite le slide d'entrée)
+        ringX = mouseX;
+        ringY = mouseY;
+      }
+
+      // Le dot suit instantanément
+      dot.style.transform = `translate3d(${mouseX - 3}px, ${mouseY - 3}px, 0)`;
+    }, { passive: true });
+
+    // --- Boucle RAF pour le ring (lerp) ---
+    function animate() {
+      ringX += (mouseX - ringX) * LERP;
+      ringY += (mouseY - ringY) * LERP;
+      ring.style.transform = `translate3d(${ringX - 20}px, ${ringY - 20}px, 0)`;
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+
+    // --- Détection hover (event delegation) ---
+    document.addEventListener('mouseover', (e) => {
+      const target = /** @type {Element} */ (e.target);
+
+      if (target.closest(INTERACTIVE)) {
+        cursor.classList.add('is-hovering');
+        cursor.classList.remove('is-canvas');
+        return;
+      }
+
+      if (isCanvasArea(target)) {
+        cursor.classList.add('is-canvas');
+        cursor.classList.remove('is-hovering');
+        return;
+      }
+
+      cursor.classList.remove('is-hovering', 'is-canvas');
+    });
+
+    /**
+     * Détecte si l'élément survolé est la zone canvas 3D.
+     * Le canvas ayant pointer-events: none, on détecte les zones
+     * "vides" où le canvas est visible derrière le contenu.
+     */
+    function isCanvasArea(el) {
+      return el === document.body
+        || el === document.documentElement
+        || el.tagName === 'MAIN'
+        || el.id === 'webgl-canvas'
+        || el.classList.contains('section-decade__visual');
+    }
+
+    // --- Masquer quand la souris quitte la fenêtre ---
+    document.addEventListener('mouseleave', () => {
+      visible = false;
+      cursor.classList.add('is-hidden');
+    });
+
+    document.addEventListener('mouseenter', () => {
+      cursor.classList.remove('is-hidden');
+    });
+
+    // --- Feedback au clic ---
+    document.addEventListener('mousedown', () => {
+      cursor.classList.add('is-clicking');
+    });
+
+    document.addEventListener('mouseup', () => {
+      cursor.classList.remove('is-clicking');
+    });
+  })();
+</script>
+
+<style>
+  /* === Conteneur curseur custom === */
+  .custom-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    pointer-events: none;
+  }
+
+  .custom-cursor.is-hidden {
+    opacity: 0;
+  }
+
+  /* === Dot — point central 6px === */
+  .custom-cursor__dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 6px;
+    background: var(--color-text-primary);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    will-change: transform;
+    transition: opacity var(--duration-fast) var(--ease-out-quart);
+    transform: translate3d(-100px, -100px, 0);
+  }
+
+  /* === Ring — anneau 40px === */
+  .custom-cursor__ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    border: 1.5px solid var(--color-text-primary);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    will-change: transform;
+    transition: scale var(--duration-base) var(--ease-out-quart),
+                opacity var(--duration-base) var(--ease-out-quart),
+                border-color var(--duration-fast) var(--ease-out-quart),
+                width var(--duration-base) var(--ease-out-quart),
+                height var(--duration-base) var(--ease-out-quart);
+    transform: translate3d(-100px, -100px, 0);
+  }
+
+  /* Pseudo-éléments pour le crosshair (masqués par défaut) */
+  .custom-cursor__ring::before,
+  .custom-cursor__ring::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background: var(--color-text-primary);
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-out-quart);
+  }
+
+  .custom-cursor__ring::before {
+    width: 1px;
+    height: 14px;
+    transform: translate(-50%, -50%);
+  }
+
+  .custom-cursor__ring::after {
+    width: 14px;
+    height: 1px;
+    transform: translate(-50%, -50%);
+  }
+
+  /* === État : hover liens/boutons === */
+  .custom-cursor.is-hovering .custom-cursor__ring {
+    scale: 1.5;
+    opacity: 0.4;
+    border-color: var(--color-accent);
+  }
+
+  .custom-cursor.is-hovering .custom-cursor__dot {
+    background: var(--color-accent);
+  }
+
+  /* === État : hover canvas 3D (crosshair) === */
+  .custom-cursor.is-canvas .custom-cursor__dot {
+    opacity: 0;
+  }
+
+  .custom-cursor.is-canvas .custom-cursor__ring {
+    opacity: 0.6;
+  }
+
+  .custom-cursor.is-canvas .custom-cursor__ring::before,
+  .custom-cursor.is-canvas .custom-cursor__ring::after {
+    opacity: 0.8;
+  }
+
+  /* === État : clic === */
+  .custom-cursor.is-clicking .custom-cursor__dot {
+    scale: 0.5;
+  }
+
+  .custom-cursor.is-clicking .custom-cursor__ring {
+    scale: 0.85;
+  }
+
+  /* === Mobile : masquer le curseur custom === */
+  @media (hover: none) {
+    .custom-cursor {
+      display: none !important;
+    }
+  }
+
+  /* === Forcer cursor: none sur tout le document === */
+  :global(body.has-custom-cursor),
+  :global(body.has-custom-cursor *) {
+    cursor: none !important;
+  }
+</style>

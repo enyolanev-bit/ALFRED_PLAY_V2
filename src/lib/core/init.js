@@ -139,50 +139,57 @@ function animateContact() {
 /**
  * Initialise le pipeline 3D (SceneManager + SceneLoader).
  * Appelé de façon lazy : après le CTA clic ou quand la première décennie est visible.
+ *
+ * Retourne une Promise partagée — tous les appelants attendent la même initialisation.
+ * Corrige la race condition où onEnter appelait activateScene() avant la fin du chargement.
  */
-let threeInitialized = false;
+/** @type {Promise<void> | null} */
+let threeInitPromise = null;
 
-async function initThreeJS() {
-  if (threeInitialized) return;
-  threeInitialized = true;
+function initThreeJS() {
+  if (threeInitPromise) return threeInitPromise;
 
-  const canvas = document.getElementById('webgl-canvas');
-  if (!canvas) return;
+  threeInitPromise = (async () => {
+    const canvas = document.getElementById('webgl-canvas');
+    if (!canvas) return;
 
-  // Import dynamique — Three.js n'est chargé qu'ici (code-splitting)
-  const [{ sceneManager: sm }, { sceneLoader: sl }] = await Promise.all([
-    import('./SceneManager.js'),
-    import('./SceneLoader.js'),
-  ]);
-  sceneManager = sm;
-  sceneLoader = sl;
+    // Import dynamique — Three.js n'est chargé qu'ici (code-splitting)
+    const [{ sceneManager: sm }, { sceneLoader: sl }] = await Promise.all([
+      import('./SceneManager.js'),
+      import('./SceneLoader.js'),
+    ]);
+    sceneManager = sm;
+    sceneLoader = sl;
 
-  // Initialiser le SceneManager (détection GPU + renderer + caméra)
-  const qualityResult = await sceneManager.init(canvas);
+    // Initialiser le SceneManager (détection GPU + renderer + caméra)
+    const qualityResult = await sceneManager.init(canvas);
 
-  // Si tier 0 → pas de 3D, on reste en fallback 2D
-  if (qualityResult.tier === 0) {
-    document.body.classList.add('no-webgl');
-    return;
-  }
+    // Si tier 0 → pas de 3D, on reste en fallback 2D
+    if (qualityResult.tier === 0) {
+      document.body.classList.add('no-webgl');
+      return;
+    }
 
-  // Initialiser le SceneLoader (GLTFLoader + DRACOLoader singletons)
-  sceneLoader.init();
+    // Initialiser le SceneLoader (GLTFLoader + DRACOLoader singletons)
+    sceneLoader.init();
 
-  // Observer les sections décennies pour le préchargement / dispose
-  const decadeSections = document.querySelectorAll('.section-decade');
-  if (decadeSections.length > 0) {
-    sceneLoader.observeSections(decadeSections);
-  }
+    // Observer les sections décennies pour le préchargement / dispose
+    const decadeSections = document.querySelectorAll('.section-decade');
+    if (decadeSections.length > 0) {
+      sceneLoader.observeSections(decadeSections);
+    }
 
-  // Initialiser l'InteractionHandler (rotation drag/touch sur les objets 3D)
-  interactionHandler.init(sceneManager);
+    // Initialiser l'InteractionHandler (rotation drag/touch sur les objets 3D)
+    interactionHandler.init(sceneManager);
 
-  // Exposer les infos de debug sur window (dev only)
-  if (import.meta.env.DEV) {
-    window.__sceneManager = sceneManager;
-    window.__sceneLoader = sceneLoader;
-  }
+    // Exposer les infos de debug sur window (dev only)
+    if (import.meta.env.DEV) {
+      window.__sceneManager = sceneManager;
+      window.__sceneLoader = sceneLoader;
+    }
+  })();
+
+  return threeInitPromise;
 }
 
 /**
@@ -242,14 +249,15 @@ function init() {
     const decadeId = section.getAttribute('data-decade');
 
     scrollEngine.createDecadeTrigger(section, {
-      onEnter: () => {
+      onEnter: async () => {
         section.classList.add('is-active');
 
-        // Initialiser Three.js si ce n'est pas encore fait (scroll direct sans CTA)
-        initThreeJS();
+        // Attendre que Three.js soit complètement initialisé (corrige la race condition)
+        await initThreeJS();
 
-        // Activer la scène 3D de cette décennie (si le manager est chargé)
-        if (sceneManager) {
+        // Précharger la scène de cette décennie et l'activer
+        if (sceneManager && sceneLoader) {
+          await sceneLoader.preload(decadeId);
           sceneManager.activateScene(decadeId);
         }
 

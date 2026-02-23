@@ -5,6 +5,7 @@
  */
 
 import AudioToggle from '../components/ui/AudioToggle.astro';
+import CustomCursor from '../components/ui/CustomCursor.astro';
 
 interface Props {
   title?: string;
@@ -47,6 +48,9 @@ const {
     <div class="ui-overlay" id="ui-overlay">
       <AudioToggle />
     </div>
+
+    <!-- Couche 4 — Curseur custom (z-index: 9999) -->
+    <CustomCursor />
 
     <!-- Script d'initialisation — chargé côté client -->
     <script>
