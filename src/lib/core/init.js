@@ -79,12 +79,13 @@ function animateIntro() {
 
 /**
  * Animations des textes historiques et personnels — révélation progressive au scroll.
- * Le texte historique apparaît d'abord, puis l'histoire personnelle de Nevil suit avec un léger décalage.
+ * L'histoire personnelle apparaît d'abord (elle est au-dessus dans le DOM),
+ * puis le texte historique suit, et enfin le teaser Zeigarnik en bas de section.
  */
 function animateDecadeTexts() {
-  // Textes historiques — fade-in + slide-up scrub
-  const textElements = document.querySelectorAll('[data-decade-text]');
-  textElements.forEach((el) => {
+  // Histoires personnelles — apparaissent en premier
+  const personalElements = document.querySelectorAll('[data-decade-personal]');
+  personalElements.forEach((el) => {
     gsap.to(el, {
       scrollTrigger: {
         trigger: el.closest('.section-decade'),
@@ -98,14 +99,30 @@ function animateDecadeTexts() {
     });
   });
 
-  // Histoires personnelles — apparaissent un peu après le texte historique
-  const personalElements = document.querySelectorAll('[data-decade-personal]');
-  personalElements.forEach((el) => {
+  // Textes historiques — fade-in + slide-up scrub, léger décalage après le personal
+  const textElements = document.querySelectorAll('[data-decade-text]');
+  textElements.forEach((el) => {
     gsap.to(el, {
       scrollTrigger: {
         trigger: el.closest('.section-decade'),
-        start: 'top 40%',
-        end: 'top 5%',
+        start: 'top 45%',
+        end: 'top 10%',
+        scrub: 0.8,
+      },
+      opacity: 1,
+      y: 0,
+      ease: 'none',
+    });
+  });
+
+  // Teasers Zeigarnik — apparaissent en dernier, en bas de section
+  const teaserElements = document.querySelectorAll('.section-decade__teaser');
+  teaserElements.forEach((el) => {
+    gsap.to(el, {
+      scrollTrigger: {
+        trigger: el.closest('.section-decade'),
+        start: 'top 30%',
+        end: 'top 0%',
         scrub: 0.8,
       },
       opacity: 1,

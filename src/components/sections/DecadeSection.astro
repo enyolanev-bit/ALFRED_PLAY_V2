@@ -12,10 +12,11 @@ interface Props {
   subtitle: string;
   historicalText?: string;
   personalStory?: string;
+  transitionTeaser?: string | null;
   fallbackImage?: string;
 }
 
-const { id, label, title, subtitle, historicalText, personalStory, fallbackImage } = Astro.props;
+const { id, label, title, subtitle, historicalText, personalStory, transitionTeaser, fallbackImage } = Astro.props;
 ---
 
 <section
@@ -32,17 +33,18 @@ const { id, label, title, subtitle, historicalText, personalStory, fallbackImage
     <h2 class="section-decade__title">{title}</h2>
     <p class="section-decade__subtitle">{subtitle}</p>
 
-    {historicalText && (
-      <p class="section-decade__history" data-decade-text>
-        {historicalText}
-      </p>
-    )}
-
+    {/* Histoire personnelle — AU-DESSUS du texte historique */}
     {personalStory && (
       <blockquote class="section-decade__personal" data-decade-personal>
         <span class="section-decade__personal-tag">Mon histoire</span>
         <p>{personalStory}</p>
       </blockquote>
+    )}
+
+    {historicalText && (
+      <p class="section-decade__history" data-decade-text>
+        {historicalText}
+      </p>
     )}
   </div>
 
@@ -59,6 +61,14 @@ const { id, label, title, subtitle, historicalText, personalStory, fallbackImage
       />
     )}
   </div>
+
+  {/* Teaser Zeigarnik — cliffhanger en bas de section */}
+  {transitionTeaser && (
+    <div class="section-decade__teaser" aria-hidden="true">
+      <p class="section-decade__teaser-text">{transitionTeaser}</p>
+      <span class="section-decade__teaser-chevron">&#8595;</span>
+    </div>
+  )}
 </section>
 
 <style>
@@ -115,19 +125,7 @@ const { id, label, title, subtitle, historicalText, personalStory, fallbackImage
     line-height: 1.5;
   }
 
-  /* Texte historique — apparaît progressivement au scroll (GSAP) */
-  .section-decade__history {
-    font-family: var(--font-body);
-    font-size: var(--text-body);
-    color: var(--color-text-primary);
-    line-height: 1.7;
-    max-width: 38ch;
-    margin-top: var(--space-md);
-    opacity: 0;
-    transform: translateY(1.5rem);
-  }
-
-  /* Histoire personnelle — bloc avec bordure accent */
+  /* Histoire personnelle — bloc avec bordure accent, AU-DESSUS du texte historique */
   .section-decade__personal {
     border-left: 3px solid var(--color-accent);
     padding-left: var(--space-md);
@@ -155,6 +153,19 @@ const { id, label, title, subtitle, historicalText, personalStory, fallbackImage
     font-style: italic;
     line-height: 1.7;
     margin: 0;
+    opacity: 0.8;
+  }
+
+  /* Texte historique — apparaît progressivement au scroll (GSAP) */
+  .section-decade__history {
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    color: var(--color-text-primary);
+    line-height: 1.7;
+    max-width: 38ch;
+    margin-top: var(--space-md);
+    opacity: 0;
+    transform: translateY(1.5rem);
   }
 
   /* Colonne visuelle — espace pour le canvas 3D */
@@ -175,5 +186,43 @@ const { id, label, title, subtitle, historicalText, personalStory, fallbackImage
 
   :global(body.no-webgl) .section-decade__fallback {
     display: block;
+  }
+
+  /* Teaser Zeigarnik — cliffhanger en bas de section */
+  .section-decade__teaser {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding-top: var(--space-lg);
+    padding-bottom: var(--space-md);
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+
+  .section-decade__teaser-text {
+    font-family: var(--font-body);
+    font-size: var(--text-small);
+    color: var(--color-accent);
+    font-style: italic;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .section-decade__teaser-chevron {
+    display: inline-block;
+    font-size: 1.25rem;
+    color: var(--color-accent);
+    margin-top: var(--space-xs);
+    animation: teaser-bounce 2s var(--ease-out-quart, cubic-bezier(0.25, 1, 0.5, 1)) infinite;
+  }
+
+  @keyframes teaser-bounce {
+    0%, 100% {
+      transform: translateY(0);
+      opacity: 0.6;
+    }
+    50% {
+      transform: translateY(6px);
+      opacity: 1;
+    }
   }
 </style>

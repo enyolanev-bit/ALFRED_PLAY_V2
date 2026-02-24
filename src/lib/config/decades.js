@@ -13,8 +13,9 @@ export const DECADES = [
     model: '/models/souris-1960.glb',
     fallbackImage: '/images/fallback/fallback-1960.svg',
     audio: '/audio/ambiance-1960.mp3',
-    personalStory: '',
+    personalStory: 'Bien avant ma naissance, un homme rêvait que les machines amplifieraient l\'esprit humain. Cette idée — que l\'informatique devrait être aussi naturelle que lire ou écrire — me poursuit encore aujourd\'hui.',
     historicalText: 'En 1968, Douglas Engelbart présente ce qui deviendra la « mère de toutes les démos ». Devant un millier de spectateurs médusés, il dévoile un petit boîtier en bois monté sur deux roues : la souris. Ce geste simple — pointer, cliquer — va redéfinir notre rapport aux machines pour toujours.',
+    transitionTeaser: 'Mais pointer ne suffisait plus. Il fallait parler à la machine...',
     sceneModule: () => import('../scenes/Scene1960.js'),
   },
   {
@@ -25,8 +26,9 @@ export const DECADES = [
     model: '/models/terminal-1970.glb',
     fallbackImage: '/images/fallback/fallback-1970.svg',
     audio: '/audio/ambiance-1970.mp3',
-    personalStory: '',
+    personalStory: 'Un écran noir, un curseur. Pas de bouton, pas d\'icône. Juste toi et la machine, en conversation brute. C\'est cette simplicité originelle qui m\'a attiré vers la tech.',
     historicalText: 'Un écran noir. Un curseur vert qui clignote. Dans les années 70, les terminaux VT100 ouvrent les portes d\'Unix à une génération de pionniers. On tape des commandes, on parle à la machine en texte brut. Le code source du futur s\'écrit ligne par ligne, dans le silence des salles serveurs.',
+    transitionTeaser: 'Le texte brut allait bientôt céder sa place à quelque chose de plus... personnel.',
     sceneModule: () => import('../scenes/Scene1970.js'),
   },
   {
@@ -37,8 +39,9 @@ export const DECADES = [
     model: '/models/gameboy-1980.glb',
     fallbackImage: '/images/fallback/fallback-1980.svg',
     audio: '/audio/ambiance-1980.mp3',
-    personalStory: '',
+    personalStory: 'Le Game Boy, c\'est ma madeleine de Proust. Le premier objet technologique que j\'ai tenu dans mes mains. Il m\'a appris qu\'un écran pouvait être magique.',
     historicalText: 'L\'informatique quitte les labos pour entrer dans les chambres. Le Macintosh démocratise l\'interface graphique, le Game Boy met un ordinateur dans chaque poche. Pour la première fois, les enfants jouent avec des pixels. La révolution personnelle est en marche — et elle ne s\'arrêtera plus.',
+    transitionTeaser: 'Les chambres étaient conquises. Restait le monde entier à connecter.',
     sceneModule: () => import('../scenes/Scene1980.js'),
   },
   {
@@ -51,6 +54,7 @@ export const DECADES = [
     audio: '/audio/ambiance-1990.mp3',
     personalStory: 'Je suis né en 1999. Avant d\'arriver en France, je ne connaissais que la télévision. Le monde numérique existait déjà — mais pas encore pour moi.',
     historicalText: 'Le modem 56k chante sa mélodie de connexion. Tim Berners-Lee invente le World Wide Web au CERN, et soudain, le monde entier tient dans un navigateur. Les premières pages HTML clignotent en Comic Sans. L\'humanité apprend à se connecter — maladroitement, mais passionnément.',
+    transitionTeaser: 'Le monde était connecté. Mais quelqu\'un allait le mettre dans notre poche.',
     sceneModule: () => import('../scenes/Scene1990.js'),
   },
   {
@@ -63,6 +67,7 @@ export const DECADES = [
     audio: '/audio/ambiance-2000.mp3',
     personalStory: 'J\'avais 7 ans quand je suis arrivé en France et que j\'ai découvert Internet pour la première fois. Une pub passait à la télé : Bill Gates et Steve Ballmer chantaient "Da Da Da" dans une voiture. Je ne comprenais pas tout, mais je sentais que le monde avait changé — et que j\'entrais dedans.',
     historicalText: '« 1 000 chansons dans votre poche. » En 2001, Steve Jobs sort l\'iPod et bouleverse l\'industrie musicale. Napster a ouvert la voie, iTunes la referme avec élégance. La molette cliquable devient un geste culturel. Le design minimaliste d\'Apple dicte les codes esthétiques d\'une décennie entière.',
+    transitionTeaser: 'La musique était libre. Bientôt, tout le reste suivrait.',
     sceneModule: () => import('../scenes/Scene2000.js'),
   },
   {
@@ -75,6 +80,7 @@ export const DECADES = [
     audio: '/audio/ambiance-2010.mp3',
     personalStory: 'Le smartphone devient naturel. Internet n\'est plus un endroit, c\'est un environnement. Je commence à voir derrière l\'écran : les systèmes, la logique, les architectures invisibles.',
     historicalText: 'Le smartphone devient une extension de nous-mêmes. Instagram transforme chaque repas en œuvre d\'art, Uber réinvente le taxi, Tinder réinvente la rencontre. On swipe, on like, on partage. En dix ans, le mobile absorbe la photo, la musique, la banque, le GPS — et notre attention.',
+    transitionTeaser: 'On avait tout dans la poche. Mais la vraie révolution n\'avait pas encore commencé.',
     sceneModule: () => import('../scenes/Scene2010.js'),
   },
   {
@@ -87,6 +93,7 @@ export const DECADES = [
     audio: '/audio/ambiance-2020.mp3',
     personalStory: 'Je découvre l\'IA générative. Pour la première fois, je peux construire des projets ambitieux — ce site en est la preuve.',
     historicalText: 'ChatGPT explose en 2022 et l\'IA entre dans le quotidien. Les machines écrivent, dessinent, composent, codent. La frontière entre humain et artificiel se brouille. On ne demande plus « est-ce qu\'un ordinateur peut penser ? » mais « qu\'est-ce que penser veut encore dire ? »',
+    transitionTeaser: null,
     sceneModule: () => import('../scenes/Scene2020.js'),
   },
 ];
