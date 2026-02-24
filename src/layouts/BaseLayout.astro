@@ -6,6 +6,8 @@
 
 import AudioToggle from '../components/ui/AudioToggle.astro';
 import CustomCursor from '../components/ui/CustomCursor.astro';
+import ProgressTimeline from '../components/ui/ProgressTimeline.astro';
+import { DECADES } from '../lib/config/decades.js';
 
 interface Props {
   title?: string;
@@ -36,6 +38,9 @@ const {
     />
   </head>
   <body>
+    <!-- Couche 0 — Barre de progression timeline (z-index: 1000) -->
+    <ProgressTimeline labels={DECADES.map(d => d.label)} />
+
     <!-- Couche 1 — Canvas WebGL (position: fixed, z-index: 0) -->
     <canvas id="webgl-canvas" aria-hidden="true"></canvas>
 

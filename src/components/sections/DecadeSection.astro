@@ -3,6 +3,7 @@
  * DecadeSection — Composant réutilisable pour chaque décennie.
  * Layout asymétrique : texte d'un côté, espace 3D de l'autre (canvas fixe visible).
  * Alternance gauche/droite gérée par CSS nth-child.
+ * Progressive disclosure : tous les éléments commencent invisibles, animés par GSAP timeline.
  */
 
 interface Props {
@@ -13,25 +14,28 @@ interface Props {
   historicalText?: string;
   personalStory?: string;
   transitionTeaser?: string | null;
+  bgColor?: string;
   fallbackImage?: string;
 }
 
-const { id, label, title, subtitle, historicalText, personalStory, transitionTeaser, fallbackImage } = Astro.props;
+const { id, label, title, subtitle, historicalText, personalStory, transitionTeaser, bgColor, fallbackImage } = Astro.props;
 ---
 
 <section
   class="section-decade"
   id={`decade-${id}`}
   data-decade={id}
+  data-bg-color={bgColor}
   aria-label={`Décennie ${label}`}
+  style={bgColor ? `background-color: transparent;` : undefined}
 >
   {/* Chiffre de décennie — très grand, très transparent, en arrière-plan */}
-  <span class="section-decade__number" aria-hidden="true">{label}</span>
+  <span class="section-decade__number" data-decade-number aria-hidden="true">{label}</span>
 
   {/* Colonne texte — gauche par défaut, droite sur les sections paires */}
   <div class="section-decade__text">
-    <h2 class="section-decade__title">{title}</h2>
-    <p class="section-decade__subtitle">{subtitle}</p>
+    <h2 class="section-decade__title" data-decade-title>{title}</h2>
+    <p class="section-decade__subtitle" data-decade-subtitle>{subtitle}</p>
 
     {/* Histoire personnelle — AU-DESSUS du texte historique */}
     {personalStory && (
@@ -72,23 +76,26 @@ const { id, label, title, subtitle, historicalText, personalStory, transitionTea
 </section>
 
 <style>
-  /* Fond transparent — la 3D (canvas z-index: 0) est visible en arrière-plan */
+  /* Fond — commence transparent, la couleur bgColor est animée par GSAP */
   .section-decade {
     background-color: transparent;
     color: var(--color-text-primary);
+    transition: background-color var(--duration-slow, 800ms) var(--ease-out-quart, cubic-bezier(0.25, 1, 0.5, 1));
   }
 
   /* Chiffre de décennie — très grand, très discret, en arrière-plan */
+  /* Commence invisible + scale réduit, animé par GSAP */
   .section-decade__number {
     font-family: var(--font-display);
     font-size: var(--text-decade);
     font-weight: 700;
     color: var(--color-text-muted);
-    opacity: 0.3;
+    opacity: 0;
     position: absolute;
     top: 50%;
     right: max(5vw, 2rem);
-    transform: translateY(-50%);
+    transform: translateY(-50%) scale(0.8);
+    transform-origin: center center;
     user-select: none;
     pointer-events: none;
     z-index: 0;
@@ -108,6 +115,7 @@ const { id, label, title, subtitle, historicalText, personalStory, transitionTea
     max-width: 600px;
   }
 
+  /* Titre — commence invisible, animé par GSAP */
   .section-decade__title {
     font-family: var(--font-display);
     font-size: var(--text-h1);
@@ -115,14 +123,19 @@ const { id, label, title, subtitle, historicalText, personalStory, transitionTea
     line-height: 1.1;
     letter-spacing: -0.02em;
     color: var(--color-accent);
+    opacity: 0;
+    transform: translateY(1.5rem);
   }
 
+  /* Sous-titre — commence invisible, animé par GSAP */
   .section-decade__subtitle {
     font-family: var(--font-body);
     font-size: var(--text-h3);
     color: var(--color-text-secondary);
     margin-top: var(--space-sm);
     line-height: 1.5;
+    opacity: 0;
+    transform: translateY(1.5rem);
   }
 
   /* Histoire personnelle — bloc avec bordure accent, AU-DESSUS du texte historique */

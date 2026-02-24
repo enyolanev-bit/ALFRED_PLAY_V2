@@ -1,0 +1,196 @@
+---
+/**
+ * ProgressTimeline — Barre de progression fixe en haut de l'écran.
+ * - Barre accent qui grandit de 0% à 100% au scroll global.
+ * - 7 dots correspondant aux décennies, avec tooltip au hover.
+ * - Le dot actif est en couleur accent, les autres en gris.
+ * - Discret : opacity 0.6 par défaut, 1 au hover.
+ */
+
+interface Props {
+  labels: string[];
+}
+
+const { labels } = Astro.props;
+---
+
+<div class="progress-timeline" id="progress-timeline" aria-hidden="true">
+  <div class="progress-timeline__bar">
+    <div class="progress-timeline__fill" id="progress-fill"></div>
+  </div>
+  <div class="progress-timeline__dots">
+    {labels.map((label, i) => (
+      <button
+        class="progress-timeline__dot"
+        data-progress-dot={i}
+        data-decade-target={label}
+        type="button"
+        aria-label={`Aller à ${label}`}
+      >
+        <span class="progress-timeline__tooltip">{label}</span>
+      </button>
+    ))}
+  </div>
+</div>
+
+<script>
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  function initProgressTimeline() {
+    const fill = document.getElementById('progress-fill');
+    const dots = document.querySelectorAll('[data-progress-dot]');
+    const sections = document.querySelectorAll('.section-decade');
+
+    if (!fill || !sections.length) return;
+
+    // Barre de progression globale — 0% à 100% du scroll total
+    gsap.to(fill, {
+      scrollTrigger: {
+        trigger: document.body,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.3,
+      },
+      width: '100%',
+      ease: 'none',
+    });
+
+    // Activer le dot correspondant à la section visible
+    sections.forEach((section, i) => {
+      if (!dots[i]) return;
+
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top 50%',
+        end: 'bottom 50%',
+        onEnter: () => setActiveDot(i),
+        onEnterBack: () => setActiveDot(i),
+      });
+    });
+
+    // Clic sur un dot → scroll vers la section
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        const target = sections[i];
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    function setActiveDot(activeIndex) {
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('is-active', i === activeIndex);
+      });
+    }
+  }
+
+  // Lancer quand le DOM est prêt
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initProgressTimeline);
+  } else {
+    initProgressTimeline();
+  }
+</script>
+
+<style>
+  .progress-timeline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    opacity: 0.6;
+    transition: opacity var(--duration-fast, 200ms) var(--ease-in-out, cubic-bezier(0.76, 0, 0.24, 1));
+  }
+
+  .progress-timeline:hover {
+    opacity: 1;
+  }
+
+  /* Barre de progression */
+  .progress-timeline__bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: transparent;
+  }
+
+  .progress-timeline__fill {
+    height: 100%;
+    width: 0%;
+    background: var(--color-accent, #E63946);
+    border-radius: 0 2px 2px 0;
+  }
+
+  /* Conteneur des dots */
+  .progress-timeline__dots {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  /* Dot individuel */
+  .progress-timeline__dot {
+    position: relative;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-text-muted, #48484A);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    pointer-events: all;
+    transition: background var(--duration-fast, 200ms) var(--ease-in-out, cubic-bezier(0.76, 0, 0.24, 1)),
+                transform var(--duration-fast, 200ms) var(--ease-in-out, cubic-bezier(0.76, 0, 0.24, 1));
+  }
+
+  .progress-timeline__dot:hover {
+    transform: scale(1.8);
+    background: var(--color-accent-hover, #FF4D5A);
+  }
+
+  .progress-timeline__dot.is-active {
+    background: var(--color-accent, #E63946);
+    transform: scale(1.5);
+  }
+
+  /* Tooltip au hover */
+  .progress-timeline__tooltip {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-display, 'Space Grotesk', sans-serif);
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--color-text-primary, #F5F5F7);
+    background: var(--color-bg-elevated, #141414);
+    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+    border-radius: 4px;
+    padding: 2px 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-fast, 200ms) var(--ease-in-out, cubic-bezier(0.76, 0, 0.24, 1));
+  }
+
+  .progress-timeline__dot:hover .progress-timeline__tooltip {
+    opacity: 1;
+  }
+</style>

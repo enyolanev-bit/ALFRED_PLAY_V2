@@ -78,57 +78,124 @@ function animateIntro() {
 }
 
 /**
- * Animations des textes historiques et personnels — révélation progressive au scroll.
- * L'histoire personnelle apparaît d'abord (elle est au-dessus dans le DOM),
- * puis le texte historique suit, et enfin le teaser Zeigarnik en bas de section.
+ * Progressive Disclosure — révélation séquentielle des éléments de chaque section.
+ * Utilise gsap.timeline() avec ScrollTrigger par section pour garantir l'ordre :
+ * 1. Chiffre décennie (scale 0.8→1 + opacity)
+ * 2. Titre (fade-in + slide-up)
+ * 3. Sous-titre (fade-in + slide-up)
+ * 4. Histoire personnelle (fade-in + slide-up)
+ * 5. Texte historique (fade-in + slide-up)
+ * 6. Teaser Zeigarnik (fade-in)
+ *
+ * Inclut aussi l'animation background-color par décennie (Partie B).
  */
 function animateDecadeTexts() {
-  // Histoires personnelles — apparaissent en premier
-  const personalElements = document.querySelectorAll('[data-decade-personal]');
-  personalElements.forEach((el) => {
-    gsap.to(el, {
-      scrollTrigger: {
-        trigger: el.closest('.section-decade'),
-        start: 'top 60%',
-        end: 'top 20%',
-        scrub: 0.8,
-      },
-      opacity: 1,
-      y: 0,
-      ease: 'none',
-    });
-  });
+  const sections = document.querySelectorAll('.section-decade');
 
-  // Textes historiques — fade-in + slide-up scrub, léger décalage après le personal
-  const textElements = document.querySelectorAll('[data-decade-text]');
-  textElements.forEach((el) => {
-    gsap.to(el, {
+  sections.forEach((section) => {
+    const bgColor = section.getAttribute('data-bg-color');
+
+    // Timeline scrubée au scroll pour le stagger séquentiel
+    const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: el.closest('.section-decade'),
-        start: 'top 45%',
+        trigger: section,
+        start: 'top 80%',
         end: 'top 10%',
         scrub: 0.8,
       },
-      opacity: 1,
-      y: 0,
-      ease: 'none',
     });
-  });
 
-  // Teasers Zeigarnik — apparaissent en dernier, en bas de section
-  const teaserElements = document.querySelectorAll('.section-decade__teaser');
-  teaserElements.forEach((el) => {
-    gsap.to(el, {
-      scrollTrigger: {
-        trigger: el.closest('.section-decade'),
-        start: 'top 30%',
-        end: 'top 0%',
-        scrub: 0.8,
-      },
-      opacity: 1,
-      y: 0,
-      ease: 'none',
-    });
+    // 1. Chiffre décennie — scale de 0.8 à 1 + opacity 0→0.3
+    const number = section.querySelector('[data-decade-number]');
+    if (number) {
+      tl.to(number, {
+        opacity: 0.3,
+        scale: 1,
+        duration: 0.3,
+        ease: 'none',
+      }, 0);
+    }
+
+    // 2. Titre — fade-in + slide-up (délai 0.2)
+    const title = section.querySelector('[data-decade-title]');
+    if (title) {
+      tl.to(title, {
+        opacity: 1,
+        y: 0,
+        duration: 0.3,
+        ease: 'none',
+      }, 0.2);
+    }
+
+    // 3. Sous-titre — fade-in + slide-up (délai 0.3)
+    const subtitle = section.querySelector('[data-decade-subtitle]');
+    if (subtitle) {
+      tl.to(subtitle, {
+        opacity: 1,
+        y: 0,
+        duration: 0.3,
+        ease: 'none',
+      }, 0.3);
+    }
+
+    // 4. Histoire personnelle — fade-in + slide-up (délai 0.5)
+    const personal = section.querySelector('[data-decade-personal]');
+    if (personal) {
+      tl.to(personal, {
+        opacity: 1,
+        y: 0,
+        duration: 0.3,
+        ease: 'none',
+      }, 0.5);
+    }
+
+    // 5. Texte historique — fade-in + slide-up (délai 0.8)
+    const history = section.querySelector('[data-decade-text]');
+    if (history) {
+      tl.to(history, {
+        opacity: 1,
+        y: 0,
+        duration: 0.3,
+        ease: 'none',
+      }, 0.8);
+    }
+
+    // 6. Teaser Zeigarnik — fade-in en dernier
+    const teaser = section.querySelector('.section-decade__teaser');
+    if (teaser) {
+      tl.to(teaser, {
+        opacity: 1,
+        y: 0,
+        duration: 0.3,
+        ease: 'none',
+      }, 1.0);
+    }
+
+    // Background-color par décennie — fondu au scroll
+    if (bgColor) {
+      gsap.to(section, {
+        scrollTrigger: {
+          trigger: section,
+          start: 'top 60%',
+          end: 'top 30%',
+          scrub: 0.5,
+        },
+        backgroundColor: bgColor,
+        ease: 'none',
+      });
+
+      // Fondu sortant — retour transparent en quittant la section
+      gsap.to(section, {
+        scrollTrigger: {
+          trigger: section,
+          start: 'bottom 40%',
+          end: 'bottom 10%',
+          scrub: 0.5,
+        },
+        backgroundColor: 'transparent',
+        ease: 'none',
+      });
+    }
   });
 }
 
