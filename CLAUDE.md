@@ -5,6 +5,16 @@
 Portfolio immersif racontant l'histoire de l'informatique (1960-2020) avec Three.js + Astro.
 Repository : https://github.com/enyolanev-bit/ALFRED_PLAY_V2
 
+## Triggers (chargement conditionnel)
+
+Quand tu travailles sur certains fichiers, charge automatiquement le doc spécialisé :
+
+- Si tu touches `init.js`, `ScrollEngine.js`, `ProgressTimeline`, ou tout fichier GSAP → charge `docs/ANIMATIONS.md`
+- Si tu touches `SceneManager.js`, `SceneLoader.js`, `scenes/Scene*.js`, ou fichiers `.glb` → charge `docs/3D-PIPELINE.md`
+- Si tu touches `AudioManager.js`, `audio/`, ou Howler.js → charge `docs/AUDIO.md`
+- Si tu touches `decades.js`, `DecadeSection.astro`, ou le contenu textuel → charge `docs/STORYTELLING.md`
+- Si tu touches `global.css`, `design-system.md`, ou tout style → charge `docs/design-system.md`
+
 ## Stack technique
 
 - **Framework** : Astro v5
@@ -54,30 +64,6 @@ Ce fichier contient :
 4. **Espace blanc GÉNÉREUX** : min 128px entre sections
 5. **Animations SUBTILES** : cubic-bezier(0.16, 1, 0.3, 1), jamais de bounce sur texte
 6. **Texte max 600px de large** : max-width: 38ch pour la lisibilité
-
-## Interactions curseur (micro-interactions 3D)
-
-Chaque scène implémente `onCursorMove(mx, my)` appelée par SceneManager à chaque frame.
-Le curseur est normalisé en -1 à +1, lissé par lerp (CURSOR_LERP = 0.12) dans la boucle RAF.
-Mobile : fallback `deviceorientation` (gyroscope).
-
-### Scales actuels des objets 3D (NE PAS réduire de plus de 30% d'un coup)
-
-| Scène | Scale | Interaction curseur |
-|-------|-------|-------------------|
-| 1960 Souris | 2.8 | Parallax 3D (position X/Z suit le curseur) |
-| 1970 VT100 | 1.2 | Écran phosphore s'illumine + curseur clignote plus vite |
-| 1980 Game Boy | 1.5 | Tilt 3D (inclinaison suit la souris) |
-| 1990 Globe | 1.08 | Rotation accélère avec le mouvement curseur |
-| 2000 iPod | 1.7 | Click wheel tourne vers la direction du curseur |
-| 2010 iPhone | 1.2 | Écran s'allume plus fort au hover |
-| 2020 Cerveau IA | 1.8 | Anneaux dévient, particules attirées, nodes pulsent |
-
-### Leçons apprises
-
-- Réduire les scales de 40% d'un coup rend certains objets invisibles — ajuster par paliers de 20-30% max
-- Les amplitudes d'interaction doivent être exagérées (×3 du premier instinct) pour être perceptibles sur un canvas fullscreen
-- Le lerp à 0.08 était trop lent, 0.12 donne un bon compromis fluidité/réactivité
 
 ## Code conventions
 
