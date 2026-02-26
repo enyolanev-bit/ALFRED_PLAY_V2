@@ -1,11 +1,11 @@
-## 🤖 AI-Assisted Development — Prompt Hierarchy
+##  AI-Assisted Development — Prompt Hierarchy
 
 This project uses Claude Code (Anthropic) as a development co-pilot, orchestrated through a **4-layer prompt hierarchy** inspired by LLM architecture principles (MIT Professional Education — Module 4.4).
 
 ### Architecture
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  🔴 LAYER 1 — Constitution (Super System Message)       │
+│   LAYER 1 — Constitution (Super System Message)       │
 │                                                         │
 │  CLAUDE.md                                              │
 │  ├── Design rules (3 colors, 2 fonts, asymmetric)       │
@@ -16,7 +16,7 @@ This project uses Claude Code (Anthropic) as a development co-pilot, orchestrate
 │                                                         │
 │  Always loaded. Every session. ~3.5KB = ~900 tokens.    │
 ├─────────────────────────────────────────────────────────┤
-│  🟠 LAYER 2 — Conditional Context (System Messages)     │
+│   LAYER 2 — Conditional Context (System Messages)     │
 │                                                         │
 │  docs/.md — Loaded on trigger, not by default          │
 │  ├── product-brief.md    (@product)                     │
@@ -32,14 +32,14 @@ This project uses Claude Code (Anthropic) as a development co-pilot, orchestrate
 │                                                         │
 │  Loaded only when relevant. Saves context window.       │
 ├─────────────────────────────────────────────────────────┤
-│  🟢 LAYER 3 — User Prompts                              │
+│   LAYER 3 — User Prompts                              │
 │                                                         │
 │  Terminal commands in Cursor / Claude Code               │
 │  "Add parallax effect to Scene1980 Game Boy"            │
 │  "Fix race condition in init.js"                        │
 │  "Create GLTF loader with DRACO fallback"               │
 ├─────────────────────────────────────────────────────────┤
-│  🔵 LAYER 4 — Generated Output                          │
+│   LAYER 4 — Generated Output                          │
 │                                                         │
 │  Code committed to git (co-authored with Claude Opus)   │
 │  ├── src/lib/core/.js                                  │
@@ -49,7 +49,7 @@ This project uses Claude Code (Anthropic) as a development co-pilot, orchestrate
 │                                                         │
 │  Output becomes input: committed code updates           │
 │  the project context for the next session.              │
-│  This is the feedback loop. ♻️                           │
+│  This is the feedback loop.                            │
 └─────────────────────────────────────────────────────────┘
 ```
 
