@@ -11,6 +11,7 @@
  */
 
 import * as THREE from 'three';
+import gsap from 'gsap';
 
 /** Palette couleurs 1980 — rétro gaming, ambiance arcade */
 const PALETTE = {
@@ -56,6 +57,12 @@ export default class Scene1980 {
     this._tiltX = 0;
     /** @type {number} Tilt Y cible (inclinaison gauche/droite) */
     this._tiltY = 0;
+
+    /** @type {THREE.Mesh|null} Référence à l'écran pour le flash easter egg */
+    this._screenMesh = null;
+
+    /** @type {boolean} Easter egg en cours (anti-spam) */
+    this._easterEggActive = false;
 
     /** @type {boolean} */
     this._initialized = false;
@@ -108,6 +115,117 @@ export default class Scene1980 {
   onCursorMove(mx, my) {
     this._tiltY = mx * 0.4;
     this._tiltX = my * -0.3;
+  }
+
+  /**
+   * Easter egg : clic sur le Game Boy.
+   * Joue un bip 8-bit, flash l'écran vert, affiche "Press Start".
+   * @param {object} _intersect — Objet d'intersection Three.js (non utilisé)
+   */
+  onClick(_intersect) {
+    if (this._easterEggActive) return;
+    this._easterEggActive = true;
+
+    // 1. Son 8-bit via Web Audio API (bip de démarrage Game Boy)
+    this._playStartupBip();
+
+    // 2. Flash écran vert (emissive 0.15 → 0.9 → retour 0.15 en 500ms)
+    if (this._screenMesh) {
+      const mat = this._screenMesh.material;
+      mat.emissive.setHex(0x00ff44); // Vert Game Boy
+      gsap.to(mat, {
+        emissiveIntensity: 0.9,
+        duration: 0.1,
+        onComplete: () => {
+          gsap.to(mat, {
+            emissiveIntensity: 0.15,
+            duration: 0.4,
+            onComplete: () => {
+              mat.emissive.setHex(PALETTE.screenGlow);
+            },
+          });
+        },
+      });
+    }
+
+    // 3. Texte "Press Start" en CSS overlay
+    this._showPressStart();
+
+    // Débloquer après 2.5s (durée totale de l'animation)
+    setTimeout(() => {
+      this._easterEggActive = false;
+    }, 2500);
+  }
+
+  /**
+   * Génère un bip 8-bit via Web Audio API (deux tons courts : C5 → G5).
+   */
+  _playStartupBip() {
+    try {
+      const ctx = window.__audioContext || new (window.AudioContext || window.webkitAudioContext)();
+      if (ctx.state === 'suspended') ctx.resume();
+
+      const playTone = (freq, startTime, duration) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square'; // Son 8-bit
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.12, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      };
+
+      const now = ctx.currentTime;
+      playTone(523.25, now, 0.12);        // Do5
+      playTone(783.99, now + 0.15, 0.2);  // Sol5
+    } catch {
+      // Pas de Web Audio API — silencieux
+    }
+  }
+
+  /**
+   * Affiche "Press Start" au-dessus du canvas avec fade-out GSAP.
+   */
+  _showPressStart() {
+    // Créer l'élément overlay
+    const el = document.createElement('div');
+    el.textContent = 'Press Start';
+    Object.assign(el.style, {
+      position: 'fixed',
+      top: '40%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      fontFamily: "'Space Grotesk', monospace",
+      fontSize: '1.5rem',
+      fontWeight: '700',
+      color: '#9bab2f',
+      textShadow: '0 0 12px rgba(155, 171, 47, 0.6)',
+      zIndex: '10000',
+      pointerEvents: 'none',
+      opacity: '0',
+      letterSpacing: '0.2em',
+      textTransform: 'uppercase',
+    });
+    document.body.appendChild(el);
+
+    // Fade in → attente → fade out → suppression
+    gsap.to(el, {
+      opacity: 1,
+      duration: 0.2,
+      ease: 'power2.out',
+      onComplete: () => {
+        gsap.to(el, {
+          opacity: 0,
+          duration: 0.6,
+          delay: 1.4,
+          ease: 'power2.in',
+          onComplete: () => el.remove(),
+        });
+      },
+    });
   }
 
   /**
@@ -243,6 +361,7 @@ export default class Scene1980 {
     );
     screen.position.set(0, 0.35, 0.21);
     this.gameboyGroup.add(screen);
+    this._screenMesh = screen;
 
     // --- D-pad (croix directionnelle) ---
     // Barre horizontale

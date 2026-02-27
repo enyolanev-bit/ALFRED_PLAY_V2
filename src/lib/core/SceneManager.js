@@ -15,6 +15,13 @@ import { getQualityConfig } from '../utils/gpu-detect.js';
 /** Facteur de lerp pour le lissage curseur (0-1, plus bas = plus smooth) */
 const CURSOR_LERP = 0.12;
 
+/** Facteur de lerp pour le parallax caméra (plus lent que le curseur = mouvement doux) */
+const CAMERA_PARALLAX_LERP = 0.08;
+/** Amplitude du parallax caméra en X */
+const CAMERA_PARALLAX_X = 0.3;
+/** Amplitude du parallax caméra en Y */
+const CAMERA_PARALLAX_Y = 0.15;
+
 class SceneManager {
   constructor() {
     /** @type {THREE.WebGLRenderer | null} */
@@ -47,11 +54,24 @@ class SceneManager {
     /** @type {{ x: number, y: number }} Position cible brute */
     this._mouseTarget = { x: 0, y: 0 };
 
+    // --- Parallax caméra (lerp séparé, plus doux) ---
+    /** @type {{ x: number, y: number }} Offset parallax actuel */
+    this._cameraParallax = { x: 0, y: 0 };
+    /** @type {{ x: number, y: number, z: number }} Position de base de la caméra */
+    this._cameraBasePos = { x: 0, y: 0, z: 5 };
+
+    // --- Raycaster pour détection de clics sur objets 3D ---
+    /** @type {THREE.Raycaster} */
+    this._raycaster = new THREE.Raycaster();
+    /** @type {THREE.Vector2} */
+    this._clickNDC = new THREE.Vector2();
+
     // Bind pour conserver le contexte
     this._onResize = this._onResize.bind(this);
     this._renderLoop = this._renderLoop.bind(this);
     this._onMouseMove = this._onMouseMove.bind(this);
     this._onDeviceOrientation = this._onDeviceOrientation.bind(this);
+    this._onCanvasClick = this._onCanvasClick.bind(this);
   }
 
   /**
@@ -108,6 +128,8 @@ class SceneManager {
 
     // Écouter le curseur (desktop) et le gyroscope (mobile)
     window.addEventListener('mousemove', this._onMouseMove, { passive: true });
+    canvas.addEventListener('click', this._onCanvasClick);
+    this._canvas = canvas;
     this._initDeviceOrientation();
 
     this.initialized = true;
@@ -188,6 +210,10 @@ class SceneManager {
     window.removeEventListener('resize', this._onResize);
     window.removeEventListener('mousemove', this._onMouseMove);
     window.removeEventListener('deviceorientation', this._onDeviceOrientation);
+    if (this._canvas) {
+      this._canvas.removeEventListener('click', this._onCanvasClick);
+      this._canvas = null;
+    }
 
     if (this.renderer) {
       this.renderer.dispose();
@@ -217,6 +243,17 @@ class SceneManager {
     // Interpolation douce du curseur (lerp vers la cible)
     this.mouse.x += (this._mouseTarget.x - this.mouse.x) * CURSOR_LERP;
     this.mouse.y += (this._mouseTarget.y - this.mouse.y) * CURSOR_LERP;
+
+    // Parallax caméra — lerp séparé, plus doux que le curseur
+    const targetParallaxX = this.mouse.x * CAMERA_PARALLAX_X;
+    const targetParallaxY = this.mouse.y * CAMERA_PARALLAX_Y;
+    this._cameraParallax.x += (targetParallaxX - this._cameraParallax.x) * CAMERA_PARALLAX_LERP;
+    this._cameraParallax.y += (targetParallaxY - this._cameraParallax.y) * CAMERA_PARALLAX_LERP;
+
+    if (this.camera) {
+      this.camera.position.x = this._cameraBasePos.x + this._cameraParallax.x;
+      this.camera.position.y = this._cameraBasePos.y + this._cameraParallax.y;
+    }
 
     // Rendre chaque scène active + transmettre le curseur
     for (const id of this.activeScenes) {
@@ -298,6 +335,37 @@ class SceneManager {
     } else {
       // Android / navigateurs sans permission
       window.addEventListener('deviceorientation', this._onDeviceOrientation, { passive: true });
+    }
+  }
+
+  /**
+   * Détecte les clics sur les objets 3D via raycasting.
+   * Appelle sceneInstance.onClick(intersect) si la scène l'implémente.
+   * @param {MouseEvent} e
+   */
+  _onCanvasClick(e) {
+    if (!this.camera) return;
+
+    // Normaliser la position du clic en NDC (-1 à +1)
+    this._clickNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
+    this._clickNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+    this._raycaster.setFromCamera(this._clickNDC, this.camera);
+
+    // Tester chaque scène active
+    for (const id of this.activeScenes) {
+      const sceneInstance = this.scenes.get(id);
+      if (!sceneInstance?.onClick || !sceneInstance.scene) continue;
+
+      const intersects = this._raycaster.intersectObjects(
+        sceneInstance.scene.children,
+        true
+      );
+
+      if (intersects.length > 0) {
+        sceneInstance.onClick(intersects[0]);
+        break; // Un seul clic traité à la fois
+      }
     }
   }
 

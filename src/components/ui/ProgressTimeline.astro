@@ -4,14 +4,17 @@
  * - Barre accent qui grandit de 0% à 100% au scroll global.
  * - 7 dots correspondant aux décennies, avec tooltip au hover.
  * - Le dot actif est en couleur accent, les autres en gris.
+ * - Label de la décennie active avec crossfade au changement.
  * - Discret : opacity 0.6 par défaut, 1 au hover.
+ * - Mobile : dots masqués, barre + label uniquement.
  */
 
 interface Props {
   labels: string[];
+  titles?: string[];
 }
 
-const { labels } = Astro.props;
+const { labels, titles = [] } = Astro.props;
 ---
 
 <div class="progress-timeline" id="progress-timeline" aria-hidden="true">
@@ -31,7 +34,18 @@ const { labels } = Astro.props;
       </button>
     ))}
   </div>
+  <div class="progress-timeline__label" id="progress-label"></div>
 </div>
+
+<!-- Données des titres pour le script client -->
+<script
+  id="progress-timeline-data"
+  type="application/json"
+  set:html={JSON.stringify(labels.map((label, i) => ({
+    label,
+    title: titles[i] || '',
+  })))}
+/>
 
 <script>
   import gsap from 'gsap';
@@ -43,8 +57,20 @@ const { labels } = Astro.props;
     const fill = document.getElementById('progress-fill');
     const dots = document.querySelectorAll('[data-progress-dot]');
     const sections = document.querySelectorAll('.section-decade');
+    const label = document.getElementById('progress-label');
 
     if (!fill || !sections.length) return;
+
+    // Charger les données des décennies
+    const dataEl = document.getElementById('progress-timeline-data');
+    /** @type {{ label: string, title: string }[]} */
+    let decadeData = [];
+    try {
+      decadeData = JSON.parse(dataEl?.textContent || '[]');
+    } catch { /* silencieux */ }
+
+    /** @type {number} Index de la décennie active (-1 = aucune) */
+    let currentActiveIndex = -1;
 
     // Barre de progression globale — 0% à 100% du scroll total
     gsap.to(fill, {
@@ -82,9 +108,55 @@ const { labels } = Astro.props;
     });
 
     function setActiveDot(activeIndex) {
+      if (activeIndex === currentActiveIndex) return;
+
+      const previousIndex = currentActiveIndex;
+      currentActiveIndex = activeIndex;
+
       dots.forEach((dot, i) => {
-        dot.classList.toggle('is-active', i === activeIndex);
+        const wasActive = previousIndex === i;
+        const isActive = activeIndex === i;
+
+        dot.classList.toggle('is-active', isActive);
+
+        // Micro-animation pulse sur le dot qui devient actif
+        if (isActive && !wasActive) {
+          gsap.fromTo(dot, {
+            scale: 1,
+          }, {
+            scale: 1.8,
+            duration: 0.15,
+            ease: 'power2.out',
+            yoyo: true,
+            repeat: 1,
+            onComplete: () => {
+              // Revenir à la taille active (1.5)
+              gsap.set(dot, { scale: 1.5 });
+            },
+          });
+        }
       });
+
+      // Mettre à jour le label avec crossfade
+      if (label && decadeData[activeIndex]) {
+        const { label: decadeLabel, title } = decadeData[activeIndex];
+        const text = title ? `${decadeLabel} — ${title}` : decadeLabel;
+
+        // Crossfade : fade out → changer texte → fade in
+        gsap.to(label, {
+          opacity: 0,
+          duration: 0.15,
+          ease: 'power2.in',
+          onComplete: () => {
+            label.textContent = text;
+            gsap.to(label, {
+              opacity: 1,
+              duration: 0.3,
+              ease: 'power2.out',
+            });
+          },
+        });
+      }
     }
   }
 
@@ -156,8 +228,7 @@ const { labels } = Astro.props;
     padding: 0;
     cursor: pointer;
     pointer-events: all;
-    transition: background var(--duration-fast, 200ms) var(--ease-in-out, cubic-bezier(0.76, 0, 0.24, 1)),
-                transform var(--duration-fast, 200ms) var(--ease-in-out, cubic-bezier(0.76, 0, 0.24, 1));
+    transition: background var(--duration-fast, 200ms) var(--ease-in-out, cubic-bezier(0.76, 0, 0.24, 1));
   }
 
   .progress-timeline__dot:hover {
@@ -168,6 +239,21 @@ const { labels } = Astro.props;
   .progress-timeline__dot.is-active {
     background: var(--color-accent, #E63946);
     transform: scale(1.5);
+  }
+
+  /* Label de la décennie active */
+  .progress-timeline__label {
+    position: absolute;
+    top: 6px;
+    right: 16px;
+    font-family: var(--font-display, 'Space Grotesk', sans-serif);
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--color-text-primary, #F5F5F7);
+    opacity: 0;
+    white-space: nowrap;
+    letter-spacing: 0.03em;
+    pointer-events: none;
   }
 
   /* Tooltip au hover */
@@ -192,5 +278,18 @@ const { labels } = Astro.props;
 
   .progress-timeline__dot:hover .progress-timeline__tooltip {
     opacity: 1;
+  }
+
+  /* Mobile : masquer les dots, garder barre + label */
+  @media (max-width: 767px) {
+    .progress-timeline__dots {
+      display: none;
+    }
+
+    .progress-timeline__label {
+      right: 12px;
+      top: 5px;
+      font-size: 0.65rem;
+    }
   }
 </style>
