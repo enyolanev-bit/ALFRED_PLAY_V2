@@ -65,6 +65,18 @@ Ce fichier contient :
 5. **Animations SUBTILES** : cubic-bezier(0.16, 1, 0.3, 1), jamais de bounce sur texte
 6. **Texte max 600px de large** : max-width: 38ch pour la lisibilité
 
+## BIBLE TECHNIQUES (GitHub Research 27 fév 2026)
+
+- Si tu touches aux animations ou au scroll → lis `docs/BIBLE-TECHNIQUES.md`
+- Si tu crées/modifies une section décennie → applique un layout DIFFÉRENT des autres (jamais 2 décennies identiques)
+- Si tu touches au 3D → utilise Matcaps, PAS de lumières classiques
+- Si tu touches aux textes → pattern Apple : opacity 0→1, y:20→0, mots clés en `<span>` blanc
+- Repos de référence GitHub : adrianhajdin/gsap_macbook_landing, adrianhajdin/iphone, brunosimon/folio-2019
+
+## RÈGLE ANTI-IA
+
+JAMAIS de layout identique entre 2 sections. JAMAIS de texte qui apparaît en bloc. TOUJOURS pin+scrub sur les sections principales.
+
 ## Code conventions
 
 - Pas de frameworks CSS (pas de Tailwind, pas de Bootstrap)
