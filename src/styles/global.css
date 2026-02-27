@@ -114,12 +114,10 @@ main {
   gap: var(--space-lg);
   align-items: center;
   padding: var(--space-xl) max(5vw, 2rem);
+  overflow: hidden; /* Éviter les débordements pendant le pin ScrollTrigger */
 }
 
-/* Espacement généreux entre les sections de décennie */
-.section-decade + .section-decade {
-  margin-top: var(--space-section);
-}
+/* Pin+scrub gère l'espacement — plus besoin de margin-top entre sections */
 
 /* Alternance gauche/droite pour le rythme visuel */
 .section-decade:nth-child(even) .section-decade__text   { order: 2; }

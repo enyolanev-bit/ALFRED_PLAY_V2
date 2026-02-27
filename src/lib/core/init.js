@@ -78,86 +78,90 @@ function animateIntro() {
 }
 
 /**
- * Progressive Disclosure — révélation séquentielle des éléments de chaque section.
- * Utilise gsap.timeline() avec ScrollTrigger par section pour garantir l'ordre :
- * 1. Chiffre décennie (scale 0.8→1 + opacity)
- * 2. Titre (fade-in + slide-up)
- * 3. Sous-titre (fade-in + slide-up)
- * 4. Histoire personnelle (fade-in + slide-up)
- * 5. Texte historique (fade-in + slide-up)
- * 6. Teaser Zeigarnik (fade-in)
+ * Pin + Scrub — Chaque section décennie est épinglée à l'écran.
+ * Le scroll contrôle la progression de la timeline GSAP (scrub: 1).
+ * UNE timeline par section contient :
+ * - Background-color fade-in (0→0.1)
+ * - Progressive disclosure : number, title, subtitle, personal, history, teaser (0.05→0.85)
+ * - Background-color fade-out (0.9→1.0)
  *
- * Inclut aussi l'animation background-color par décennie (Partie B).
+ * La même timeline connecte le SceneManager (3D) via les callbacks onEnter/onLeave.
+ * Technique #1 de la BIBLE TECHNIQUES (Apple pin+scrub pattern).
  */
-function animateDecadeTexts() {
+function setupPinnedDecades() {
   const sections = document.querySelectorAll('.section-decade');
 
   sections.forEach((section) => {
+    const decadeId = section.getAttribute('data-decade');
     const bgColor = section.getAttribute('data-bg-color');
 
-    // Timeline scrubée au scroll pour le stagger séquentiel
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: section,
-        start: 'top 80%',
-        end: 'top 10%',
-        scrub: 0.8,
-      },
-    });
+    // Créer UNE timeline par section (sera scrubée par ScrollTrigger via pin)
+    const tl = gsap.timeline();
 
-    // 1. Chiffre décennie — scale de 0.8 à 1 + opacity 0→0.3
+    // --- Background-color fade-in (0→0.1 de la timeline) ---
+    if (bgColor) {
+      tl.to(section, {
+        backgroundColor: bgColor,
+        duration: 0.1,
+        ease: 'none',
+      }, 0);
+    }
+
+    // --- Progressive Disclosure (0.05→0.85) ---
+
+    // 1. Chiffre décennie — scale 0.8→1 + opacity 0→0.3
     const number = section.querySelector('[data-decade-number]');
     if (number) {
       tl.to(number, {
         opacity: 0.3,
         scale: 1,
-        duration: 0.3,
+        duration: 0.12,
         ease: 'none',
-      }, 0);
+      }, 0.05);
     }
 
-    // 2. Titre — fade-in + slide-up (délai 0.2)
+    // 2. Titre — fade-in + slide-up
     const title = section.querySelector('[data-decade-title]');
     if (title) {
       tl.to(title, {
         opacity: 1,
         y: 0,
-        duration: 0.3,
+        duration: 0.12,
         ease: 'none',
-      }, 0.2);
+      }, 0.15);
     }
 
-    // 3. Sous-titre — fade-in + slide-up (délai 0.3)
+    // 3. Sous-titre — fade-in + slide-up
     const subtitle = section.querySelector('[data-decade-subtitle]');
     if (subtitle) {
       tl.to(subtitle, {
         opacity: 1,
         y: 0,
-        duration: 0.3,
+        duration: 0.12,
         ease: 'none',
-      }, 0.3);
+      }, 0.25);
     }
 
-    // 4. Histoire personnelle — fade-in + slide-up (délai 0.5)
+    // 4. Histoire personnelle — fade-in + slide-up
     const personal = section.querySelector('[data-decade-personal]');
     if (personal) {
       tl.to(personal, {
         opacity: 1,
         y: 0,
-        duration: 0.3,
+        duration: 0.15,
         ease: 'none',
-      }, 0.5);
+      }, 0.38);
     }
 
-    // 5. Texte historique — fade-in + slide-up (délai 0.8)
+    // 5. Texte historique — fade-in + slide-up
     const history = section.querySelector('[data-decade-text]');
     if (history) {
       tl.to(history, {
         opacity: 1,
         y: 0,
-        duration: 0.3,
+        duration: 0.15,
         ease: 'none',
-      }, 0.8);
+      }, 0.55);
     }
 
     // 6. Teaser Zeigarnik — fade-in en dernier
@@ -166,36 +170,64 @@ function animateDecadeTexts() {
       tl.to(teaser, {
         opacity: 1,
         y: 0,
-        duration: 0.3,
+        duration: 0.1,
         ease: 'none',
-      }, 1.0);
+      }, 0.75);
     }
 
-    // Background-color par décennie — fondu au scroll
+    // --- Background-color fade-out (0.9→1.0) ---
     if (bgColor) {
-      gsap.to(section, {
-        scrollTrigger: {
-          trigger: section,
-          start: 'top 60%',
-          end: 'top 30%',
-          scrub: 0.5,
-        },
-        backgroundColor: bgColor,
-        ease: 'none',
-      });
-
-      // Fondu sortant — retour transparent en quittant la section
-      gsap.to(section, {
-        scrollTrigger: {
-          trigger: section,
-          start: 'bottom 40%',
-          end: 'bottom 10%',
-          scrub: 0.5,
-        },
+      tl.to(section, {
         backgroundColor: 'transparent',
+        duration: 0.1,
         ease: 'none',
-      });
+      }, 0.9);
     }
+
+    // --- Créer le trigger pinned avec callbacks 3D + audio ---
+    scrollEngine.createPinnedDecadeTrigger(section, tl, {
+      onEnter: async () => {
+        section.classList.add('is-active');
+
+        // Attendre que Three.js soit complètement initialisé
+        await initThreeJS();
+
+        // Précharger la scène de cette décennie et l'activer
+        if (sceneManager && sceneLoader) {
+          await sceneLoader.preload(decadeId);
+          sceneManager.activateScene(decadeId);
+        }
+
+        window.dispatchEvent(
+          new CustomEvent('decade:enter', { detail: { id: decadeId } })
+        );
+      },
+      onLeave: () => {
+        section.classList.remove('is-active');
+
+        // Désactiver la scène 3D de cette décennie
+        if (sceneManager) {
+          sceneManager.deactivateScene(decadeId);
+        }
+
+        window.dispatchEvent(
+          new CustomEvent('decade:leave', { detail: { id: decadeId } })
+        );
+      },
+      onProgress: (progress) => {
+        // Transmettre la progression à la scène 3D pour les animations
+        const sceneInstance = sceneManager?.scenes.get(decadeId);
+        if (sceneInstance?.onScroll) {
+          sceneInstance.onScroll(progress);
+        }
+
+        window.dispatchEvent(
+          new CustomEvent('decade:progress', {
+            detail: { id: decadeId, progress },
+          })
+        );
+      },
+    });
   });
 }
 
@@ -320,62 +352,11 @@ function init() {
   // Setup du CTA "Commencer le voyage"
   setupCTA();
 
-  // Animations des textes historiques (progressive disclosure au scroll)
-  animateDecadeTexts();
+  // Pin + Scrub — sections décennies épinglées avec progressive disclosure
+  setupPinnedDecades();
 
   // Animations du contact (révélation au scroll)
   animateContact();
-
-  // Créer un trigger pour chaque section décennie
-  const decadeSections = document.querySelectorAll('.section-decade');
-
-  decadeSections.forEach((section) => {
-    const decadeId = section.getAttribute('data-decade');
-
-    scrollEngine.createDecadeTrigger(section, {
-      onEnter: async () => {
-        section.classList.add('is-active');
-
-        // Attendre que Three.js soit complètement initialisé (corrige la race condition)
-        await initThreeJS();
-
-        // Précharger la scène de cette décennie et l'activer
-        if (sceneManager && sceneLoader) {
-          await sceneLoader.preload(decadeId);
-          sceneManager.activateScene(decadeId);
-        }
-
-        window.dispatchEvent(
-          new CustomEvent('decade:enter', { detail: { id: decadeId } })
-        );
-      },
-      onLeave: () => {
-        section.classList.remove('is-active');
-
-        // Désactiver la scène 3D de cette décennie
-        if (sceneManager) {
-          sceneManager.deactivateScene(decadeId);
-        }
-
-        window.dispatchEvent(
-          new CustomEvent('decade:leave', { detail: { id: decadeId } })
-        );
-      },
-      onProgress: (progress) => {
-        // Transmettre la progression à la scène 3D pour les animations
-        const sceneInstance = sceneManager?.scenes.get(decadeId);
-        if (sceneInstance?.onScroll) {
-          sceneInstance.onScroll(progress);
-        }
-
-        window.dispatchEvent(
-          new CustomEvent('decade:progress', {
-            detail: { id: decadeId, progress },
-          })
-        );
-      },
-    });
-  });
 }
 
 // Lancer l'init quand le DOM est prêt
