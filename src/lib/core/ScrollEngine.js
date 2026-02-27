@@ -80,6 +80,39 @@ class ScrollEngine {
   }
 
   /**
+   * Crée un ScrollTrigger PINNED pour une section décennie.
+   * La section est épinglée à l'écran pendant le scroll, et la timeline GSAP
+   * est scrubée (liée au scroll) pendant toute la durée du pin.
+   *
+   * @param {HTMLElement} element — L'élément DOM de la section
+   * @param {gsap.core.Timeline} timeline — Timeline GSAP à scrubber pendant le pin
+   * @param {Object} callbacks — Callbacks optionnels
+   * @param {Function} [callbacks.onEnter] — Quand la section se pin (entre dans le viewport)
+   * @param {Function} [callbacks.onLeave] — Quand la section se dépin (quitte le viewport)
+   * @param {Function} [callbacks.onProgress] — Progression du scroll dans la section (0-1)
+   * @returns {ScrollTrigger}
+   */
+  createPinnedDecadeTrigger(element, timeline, { onEnter, onLeave, onProgress } = {}) {
+    const trigger = ScrollTrigger.create({
+      trigger: element,
+      start: 'top top',         // Pin quand le haut de la section touche le haut du viewport
+      end: '+=150%',            // La section reste pinned pendant 150% de sa hauteur de scroll
+      pin: true,                // ÉPINGLER la section
+      scrub: 1,                 // Lier l'animation au scroll (1 = léger smoothing)
+      anticipatePin: 1,         // Anticiper le pin pour éviter les saccades
+      animation: timeline,      // Timeline GSAP scrubée
+      onEnter: () => onEnter?.(),
+      onLeave: () => onLeave?.(),
+      onEnterBack: () => onEnter?.(),
+      onLeaveBack: () => onLeave?.(),
+      onUpdate: (self) => onProgress?.(self.progress),
+    });
+
+    this.triggers.push(trigger);
+    return trigger;
+  }
+
+  /**
    * Retourne la progression globale du scroll (0-1).
    * @returns {number}
    */
