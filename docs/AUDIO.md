@@ -26,13 +26,13 @@
 
 | Décennie | Son d'ambiance | Fichier | Notes |
 |----------|---------------|---------|-------|
-| 1960 | Bips électroniques subtils | `ambiance-1960.mp3` | Tons purs, oscillateurs simples, atmosphère labo |
-| 1970 | Clavier mécanique + hum terminal | `ambiance-1970.mp3` | Touches Cherry MX, ronronnement électrique CRT |
-| 1980 | Sons 8-bit Game Boy | `ambiance-1980.mp3` | Chip-tune, bleeps, start-up Game Boy |
-| 1990 | Modem 56k | `ambiance-1990.mp3` | Handshake modem, sons de connexion dial-up |
-| 2000 | Click-wheel iPod | `ambiance-2000.mp3` | Clics de molette, transitions douces |
-| 2010 | Notification iPhone | `ambiance-2010.mp3` | Tri-tone, swoosh, sons iOS |
-| 2020 | Voix IA synthétique | `ambiance-2020.mp3` | Voix synthétique, drones ambient, tons neuraux |
+| 1960 | Bips électroniques subtils | `ambiance-1960.wav` | 220Hz sine, modulation lente — atmosphère labo |
+| 1970 | Clavier mécanique + hum terminal | `ambiance-1970.wav` | 330Hz square wave filtré — hum CRT |
+| 1980 | Sons 8-bit Game Boy | `ambiance-1980.wav` | 440/554Hz alternés — chip-tune |
+| 1990 | Modem 56k | `ambiance-1990.wav` | Bruit blanc filtré + modulation — handshake modem |
+| 2000 | Click-wheel iPod | `ambiance-2000.wav` | 880Hz sine douce en cloche — minimaliste |
+| 2010 | Notification iPhone | `ambiance-2010.wav` | 1046Hz ping court répété — notification |
+| 2020 | Voix IA synthétique | `ambiance-2020.wav` | Sweep 200→2000Hz — ambiance futuriste |
 
 ---
 
@@ -66,7 +66,7 @@ AudioManager (singleton)
 ## 6. Contraintes techniques
 
 - Chaque fichier audio : **< 200KB** (loop court, 10-15 secondes)
-- Format : **MP3** (compatibilité universelle) + fallback **OGG** optionnel
+- Format : **WAV** placeholders (à remplacer par MP3 production) + fallback **OGG** optionnel
 - Lazy-load : ne charger le fichier audio que quand la décennie est proche (1 section avant)
 - Le `AudioContext` doit être créé après une interaction utilisateur (contrainte navigateur)
 

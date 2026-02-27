@@ -20,7 +20,7 @@ const CROSSFADE_DURATION = 500;
 const STORAGE_KEY = 'alfred-audio-muted';
 
 /** Volume par défaut des ambiances */
-const DEFAULT_VOLUME = 0.4;
+const DEFAULT_VOLUME = 0.3;
 
 class AudioManager {
   constructor() {
