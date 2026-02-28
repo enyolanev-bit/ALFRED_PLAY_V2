@@ -268,11 +268,6 @@ export default class Scene1980 {
     const scaledCenter = scaledBox.getCenter(new THREE.Vector3());
     gltfScene.position.sub(scaledCenter);
 
-    // --- Orienter l'écran face caméra (+Z) ---
-    // Les modèles Blender GLTF exportent souvent avec le front en -Y ou +Y.
-    // On tourne pour que l'écran (face avant) pointe vers +Z (vers la caméra).
-    gltfScene.rotation.x = Math.PI / 2;
-
     this.gameboyGroup.add(gltfScene);
 
     console.log(`[Scene1980] Scale normalisation : ×${normalizeScale.toFixed(2)} — taille finale : ~${TARGET_HEIGHT} unités`);
