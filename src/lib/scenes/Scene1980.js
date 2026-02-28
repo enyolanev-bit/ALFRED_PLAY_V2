@@ -63,8 +63,6 @@ export default class Scene1980 {
 
     // Groupe principal vide — le modèle .glb sera injecté par SceneLoader via setModel()
     this.gameboyGroup = new THREE.Group();
-    this.gameboyGroup.position.set(0, 0, 0);
-    this.gameboyGroup.rotation.x = -0.1;
     this.scene.add(this.gameboyGroup);
 
     this._setInitialState();
@@ -91,7 +89,7 @@ export default class Scene1980 {
     this.gameboyGroup.rotation.y = -0.3 + progress * Math.PI * 0.6 + this._interactionRotation + this._tiltY;
 
     // Tilt 3D : inclinaison qui suit le curseur (comme si on tient la console)
-    this.gameboyGroup.rotation.x = -0.1 + this._tiltX;
+    this.gameboyGroup.rotation.x = this._tiltX;
 
     // Centrage vertical (centre local quasi centré à y≈-0.1) + oscillation douce
     this.gameboyGroup.position.y = 0.1 * scale + Math.sin(progress * Math.PI) * 0.2;
@@ -248,29 +246,30 @@ export default class Scene1980 {
       this.gameboyGroup.remove(this.gameboyGroup.children[0]);
     }
 
-    // --- Mesurer la bounding box native du modèle ---
+    // --- Orienter l'écran face caméra ---
+    // Le modèle Sketchfab a l'écran le long de l'axe X (X=59, Y=243, Z=154).
+    // Rotation -90° autour de Y pour mettre l'écran face +Z (vers la caméra).
+    gltfScene.rotation.y = -Math.PI / 2;
+
+    // --- Mesurer la bounding box APRÈS rotation ---
     const box = new THREE.Box3().setFromObject(gltfScene);
     const size = box.getSize(new THREE.Vector3());
-    const center = box.getCenter(new THREE.Vector3());
 
-    console.log(`[Scene1980] Modèle GLB — taille native : ${size.x.toFixed(3)} × ${size.y.toFixed(3)} × ${size.z.toFixed(3)}`);
+    console.log(`[Scene1980] Modèle GLB — taille après rotation : ${size.x.toFixed(3)} × ${size.y.toFixed(3)} × ${size.z.toFixed(3)}`);
 
-    // --- Normaliser la taille ---
+    // --- Normaliser par la hauteur (Y) ---
     // Hauteur cible : 2.0 unités (× scale 1.5 de onScroll = 3.0 = ~65% viewport)
     const TARGET_HEIGHT = 2.0;
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const normalizeScale = maxDim > 0 ? TARGET_HEIGHT / maxDim : 1;
+    const normalizeScale = size.y > 0 ? TARGET_HEIGHT / size.y : 1;
 
-    gltfScene.scale.setScalar(normalizeScale);
+    gltfScene.scale.multiplyScalar(normalizeScale);
 
-    // Recalculer le centre après le scale
+    // Recalculer le centre après scale et centrer
     const scaledBox = new THREE.Box3().setFromObject(gltfScene);
     const scaledCenter = scaledBox.getCenter(new THREE.Vector3());
     gltfScene.position.sub(scaledCenter);
 
     this.gameboyGroup.add(gltfScene);
-
-    console.log(`[Scene1980] Scale normalisation : ×${normalizeScale.toFixed(2)} — taille finale : ~${TARGET_HEIGHT} unités`);
 
     // --- Chercher un mesh « écran » pour l'easter egg (le plus plat et large) ---
     this._screenMesh = null;
