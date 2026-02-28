@@ -235,7 +235,9 @@ export default class Scene1980 {
 
   /**
    * Injecte le modèle GLTF chargé par SceneLoader.
-   * Centre le modèle, cherche un mesh « écran » pour l'easter egg.
+   * Normalise la taille pour que le modèle fasse ~2 unités de haut
+   * (avec le scale 1.5 de onScroll → ~3 unités → ~65% du viewport).
+   * Oriente l'écran face caméra (+Z).
    * @param {THREE.Object3D} gltfScene — Scène GLTF chargée
    */
   setModel(gltfScene) {
@@ -246,22 +248,43 @@ export default class Scene1980 {
       this.gameboyGroup.remove(this.gameboyGroup.children[0]);
     }
 
-    // Centrer le modèle sur son bounding box
+    // --- Mesurer la bounding box native du modèle ---
     const box = new THREE.Box3().setFromObject(gltfScene);
+    const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
-    gltfScene.position.sub(center);
+
+    console.log(`[Scene1980] Modèle GLB — taille native : ${size.x.toFixed(3)} × ${size.y.toFixed(3)} × ${size.z.toFixed(3)}`);
+
+    // --- Normaliser la taille ---
+    // Hauteur cible : 2.0 unités (× scale 1.5 de onScroll = 3.0 = ~65% viewport)
+    const TARGET_HEIGHT = 2.0;
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const normalizeScale = maxDim > 0 ? TARGET_HEIGHT / maxDim : 1;
+
+    gltfScene.scale.setScalar(normalizeScale);
+
+    // Recalculer le centre après le scale
+    const scaledBox = new THREE.Box3().setFromObject(gltfScene);
+    const scaledCenter = scaledBox.getCenter(new THREE.Vector3());
+    gltfScene.position.sub(scaledCenter);
+
+    // --- Orienter l'écran face caméra (+Z) ---
+    // Les modèles Blender GLTF exportent souvent avec le front en -Y ou +Y.
+    // On tourne pour que l'écran (face avant) pointe vers +Z (vers la caméra).
+    gltfScene.rotation.x = Math.PI / 2;
 
     this.gameboyGroup.add(gltfScene);
 
-    // Chercher un mesh candidat pour le flash easter egg (le plus grand mesh plan/écran)
+    console.log(`[Scene1980] Scale normalisation : ×${normalizeScale.toFixed(2)} — taille finale : ~${TARGET_HEIGHT} unités`);
+
+    // --- Chercher un mesh « écran » pour l'easter egg (le plus plat et large) ---
     this._screenMesh = null;
     let bestArea = 0;
     gltfScene.traverse((child) => {
       if (child.isMesh) {
         child.geometry.computeBoundingBox();
-        const size = child.geometry.boundingBox.getSize(new THREE.Vector3());
-        const area = size.x * size.y;
-        // Heuristique : un écran est un mesh relativement plat et large
+        const meshSize = child.geometry.boundingBox.getSize(new THREE.Vector3());
+        const area = meshSize.x * meshSize.y;
         if (area > bestArea && child.material) {
           bestArea = area;
           this._screenMesh = child;
